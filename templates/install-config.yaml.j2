@@ -1,0 +1,37 @@
+apiVersion: v1
+baseDomain: {{ base_domain }}
+{% if proxy_env.http_proxy %}
+proxy:
+  httpProxy: "{{ proxy_env.http_proxy }}"
+  httpsProxy: "{{ proxy_env.https_proxy }}"
+  noProxy: "{{ proxy_env.no_proxy }}"
+{% endif %}
+compute:
+- hyperthreading: Enabled
+  name: worker
+  replicas: 0
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  replicas: 3
+metadata:
+  name: {{ cluster_name }}
+platform:
+  vsphere:
+    vcenter: {{ vcenter.hostname }}
+    username: {{ vcenter.username }}
+    password: {{ vcenter.password }}
+    datacenter: {{ vcenter.datacenter }}
+    defaultDatastore: {{ vcenter.datastore }}
+fips: false
+networking:
+  networkType: {{ openshift.networkType }}
+  machineCIDR: {{ openshift.machineCIDR }}
+  clusterNetworks:
+  - cidr: {{ openshift.clusterNetwork.cidr }}
+    hostPrefix: {{ openshift.clusterNetwork.hostPrefix}}
+  serviceNetwork:
+  - {{ openshift.serviceNetwork }}
+pullSecret: '{{ pull_secret }}'
+sshKey: '{{ ssh_key }}'
+

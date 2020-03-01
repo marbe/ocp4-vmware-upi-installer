@@ -1,0 +1,18 @@
+- name: Download openshift clients
+  get_url:
+    url: "{{ openshift_clients_url }}/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  loop:
+    - "{{ client_linux }}"
+    - "{{ install_linux }}"
+  environment: "{{ proxy_env }}"
+  tags: ocp-client-setup
+
+- name: Extract openshift clients
+  unarchive:
+    src: "/tmp/{{ item }}"
+    dest: /tmp/
+  loop:
+    - "{{ client_linux }}"
+    - "{{ install_linux }}"
+  tags: ocp-client-setup

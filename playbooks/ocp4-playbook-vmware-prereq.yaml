@@ -1,0 +1,24 @@
+---
+- name: Play to provision OCP4 cluster
+  hosts: localhost
+
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+    - name: install pip module to call vcenter API
+      pip:
+        name: pyvmomi
+        umask: "0022"
+      become: True
+      environment:
+        HTTP_PROXY: "{{ proxy_env.http_proxy }}"
+        HTTPS_PROXY: "{{ proxy_env.https_proxy }}"
+      when: proxy_env.http_proxy != ''
+
+    - name: install pip module to call vcenter API
+      pip:
+        name: pyvmomi
+        umask: "0022"
+      become: True
+      when: proxy_env.http_proxy == ''

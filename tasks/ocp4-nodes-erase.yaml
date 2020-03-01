@@ -1,0 +1,14 @@
+- name: Remove a virtual machine
+  vmware_guest:
+    hostname: "{{ vcenter.hostname }}"
+    username: "{{ vcenter.username }}"
+    password: "{{ vcenter.password }}"
+    datacenter: "{{ vcenter.datacenter }}"
+    cluster: "{{ vcenter.cluster }}"
+    validate_certs: no
+    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    name: "{{ item.name }}"
+    state: absent
+    force: yes
+  loop: "{{ nodes }}"
+  delegate_to: localhost

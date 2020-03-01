@@ -1,0 +1,52 @@
+---
+- name: Test DNS records for OCP4
+  hosts:
+    - localhost
+  gather_facts: no
+
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+    - "{{ playbook_dir }}/../vars/workers-list.yaml"
+
+  tasks:
+    - name: include task to test VIP records
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-records.yaml"
+      vars:
+        record: "{{ item }}"
+      loop:
+        - api
+        - api-int
+        - "*.apps"
+
+    - name: check SRV record
+      command: dig _etcd-server-ssl._tcp.{{ cluster_name }}.{{ base_domain }} SRV +short
+      register: result
+    - debug:
+        msg: DNS query _etcd-server-ssl._tcp.{{ cluster_name }}.{{ base_domain }} --> {{ result.stdout }}
+    - assert:
+        that:
+          - "'0 10 2380 {{ etcdx }}.{{ cluster_name }}.{{ base_domain }}.' in result.stdout"
+      loop:
+        - etcd-0
+        - etcd-1
+        - etcd-2
+      loop_control:
+        loop_var: etcdx
+
+    - name: test masters and etcd records consistency
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-masters-etcd.yaml"
+      vars:
+        prefix: "{{ item }}"
+      loop:
+        - etcd-0
+        - etcd-1
+        - etcd-2
+
+    - name: test workers
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-workers.yaml"
+      vars:
+        node: "{{ item.node }}"
+        addr: "{{ item.addr }}"
+      loop: "{{ workers }}"
+      tags: testworkers
+

@@ -1,0 +1,43 @@
+- name: set yum proxy if needed
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: "proxy={{ proxy_env.http_proxy }}"
+    state: present
+  when: proxy_env.http_proxy != ''
+  tags: ocp-httpd-ignition-provide
+
+- name: unset yum proxy if not needed
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: "proxy={{ proxy_env.http_proxy }}"
+    state: absent
+  when: proxy_env.http_proxy == ''
+  tags: ocp-httpd-ignition-provide
+
+- name: install httpd server to host ignition
+  package:
+    name: httpd
+    state: present
+  tags: ocp-httpd-ignition-provide
+
+- name: listen on port {{ httpd_port }}
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^(Listen) 80$'
+    replace: '\1 {{ httpd_port }}'
+  tags: ocp-httpd-ignition-provide
+
+- name: restart httpd server
+  service:
+    name: httpd
+    state: restarted
+    enabled: yes
+
+- name: Copy install-config.yaml file
+  copy:
+    src: "{{ work_dir }}/bootstrap.ign"
+    dest: "{{ document_root }}/bootstrap.ign"
+    force: yes
+  tags: ocp-httpd-ignition-provide

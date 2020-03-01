@@ -1,0 +1,74 @@
+- name: Create a virtual machine from a template
+  vmware_guest:
+    hostname: "{{ vcenter.hostname }}"
+    username: "{{ vcenter.username }}"
+    password: "{{ vcenter.password }}"
+    datacenter: "{{ vcenter.datacenter }}"
+    cluster: "{{ vcenter.cluster }}"
+    validate_certs: no
+    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    name: "{{ item.name }}"
+    state: poweredoff
+    template: "{{ ova_template_name }}"
+    disk:
+    - size_gb: "{{ item.disk }}"
+      type: thin
+      datastore: "{{ vcenter.datastore }}"
+    hardware:
+      memory_mb: "{{ item.memory }}"
+      num_cpus: "{{ item.cpu }}"
+      memory_reservation_lock: True
+      mem_limit: "{{ item.memory }}"
+      mem_reservation: "{{ item.memory }}"
+      hotadd_cpu: True
+      hotremove_cpu: True
+      hotadd_memory: False
+    networks:
+    - name: LAN1
+    wait_for_ip_address: no
+  loop: "{{ nodes }}"
+  delegate_to: localhost
+  register: deploy
+
+- name: Configure MAC address
+  vmware_guest_network:
+    hostname: "{{ vcenter.hostname }}"
+    username: "{{ vcenter.username }}"
+    password: "{{ vcenter.password }}"
+    datacenter: "{{ vcenter.datacenter }}"
+    cluster: "{{ vcenter.cluster }}"
+    validate_certs: no
+    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    name: "{{ item.name }}"
+    gather_network_info: false
+    networks:
+    - name: LAN1
+      label: "Network adapter 1"
+      state: present
+      manual_mac: "{{ item.mac }}"
+  loop: "{{ nodes }}"
+  delegate_to: localhost
+  register: network_info
+
+- name: Configure VAPP properties
+  vmware_guest:
+    hostname: "{{ vcenter.hostname }}"
+    username: "{{ vcenter.username }}"
+    password: "{{ vcenter.password }}"
+    datacenter: "{{ vcenter.datacenter }}"
+    cluster: "{{ vcenter.cluster }}"
+    validate_certs: no
+    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    name: "{{ item.name }}"
+    state: present
+    vapp_properties:
+    - id: "guestinfo.ignition.config.data.encoding"
+      value: "base64"
+    - id: "guestinfo.ignition.config.data"
+      value: "{{ ignition_payload }}"
+    - id: "disk.EnableUUID"
+      value: "TRUE"
+  loop: "{{ nodes }}"
+  delegate_to: localhost
+  register: guest_info
+

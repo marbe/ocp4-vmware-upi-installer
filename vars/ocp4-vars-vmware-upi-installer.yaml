@@ -1,0 +1,61 @@
+---
+### General variables to set working environment
+# directory to store openshift installation files
+work_dir: "/tmp/openshift-install-{{ lookup('pipe','date +%Y%m%d') }}"
+openshift_clients_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.3"
+client_linux: "openshift-client-linux-4.3.1.tar.gz"
+install_linux: "openshift-install-linux-4.3.1.tar.gz"
+# httpd server port to provide ignition file (SElinux compatible)
+httpd_port: 8008
+document_root: "/var/www/html"
+###
+
+### vmware vCenter related variables
+vcenter:
+  hostname: ""
+  username: ""
+  password: ""
+  datacenter: ""
+  cluster: ""
+  datastore: ""
+ova_template_name: ''
+###
+
+### Openshift ignition files setup related variables
+openshift:
+  networkType: "OpenShiftSDN"
+  clusterNetwork:
+    cidr: "10.128.0.0/14"
+    hostPrefix: "23"
+  serviceNetwork: "172.30.0.0/16"
+# This is the subnet in which OCP nodes are installed
+  machineCIDR: ""
+
+base_domain: ""
+cluster_name: ""
+
+bootstrap_ignition_config_url: "http://{{ ansible_default_ipv4.address }}:{{ httpd_port }}/bootstrap.ign"
+
+proxy_env:
+  http_proxy: ''
+  https_proxy: ''
+  no_proxy: ''
+
+pull_secret: ''
+
+ssh_key: ''
+###
+
+### OpenShift Nodes details to provision VMs on vmware vCenter:
+bootstrap:
+- { name: "bootstrap-01", mac: "", disk: "120", memory: "16384", cpu: "4" }
+
+masters:
+- { name: "master-01", mac: "", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master-02", mac: "", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master-03", mac: "", disk: "120", memory: "16384", cpu: "4" }
+
+workers:
+- { name: "worker-01", mac: "", disk: "120", memory: "8192", cpu: "2" }
+- { name: "worker-02", mac: "", disk: "120", memory: "8192", cpu: "2" }
+###

@@ -1,0 +1,46 @@
+---
+- name: Play to provision OCP4 cluster
+  hosts: localhost
+  become: yes
+
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+    - name: Assert that we are running on RedHat family system
+      assert:
+        that:
+          - "ansible_os_family == 'RedHat'"
+
+    - name: include task vms for client setup
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-client-setup.yaml"
+
+    - name: include task vms for ignition config
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-ignition-config.yaml"
+
+    - name: include task vms for httpd ignition providing
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-httpd-ignition-provide.yaml"
+      tags: "ocp-httpd-ignition-provide"
+
+    - name: Include vars for ignition files
+      include_vars:
+        file: "{{ playbook_dir }}/../vars/ocp4-vars-dynamic.yaml"
+
+    - name: include create task vms for bootstrap node
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
+      vars:
+        nodes: "{{ bootstrap }}"
+        ignition_payload: "{{ append_bootstrap_ign }}"
+
+    - name: include create task vms for masters node
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
+      vars:
+        nodes: "{{ masters }}"
+        ignition_payload: "{{ master_ign }}"
+
+    - name: include create task vms for workers node
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
+      vars:
+        nodes: "{{ workers }}"
+        ignition_payload: "{{ worker_ign }}"
+

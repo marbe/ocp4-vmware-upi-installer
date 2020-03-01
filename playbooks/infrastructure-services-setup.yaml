@@ -1,0 +1,29 @@
+---
+- name: Play to provision Infrastructure Services needed for OCP4 UPI installation
+  hosts: localhost
+  become: yes
+
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+    - name: Assert that we are running on RedHat family system
+      assert:
+        that:
+          - "ansible_os_family == 'RedHat'"
+
+    - name: include task for security configurations (firewalld and selinux)
+      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-security-tasks.yaml"
+
+## TO-DO: add task to install and configure DNS
+#    - name: include task vms to install and configure DNS
+#      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-bind.yaml"
+#
+## TO-DO: add task to install and configure LB
+#    - name: include task vms to install and configure LB
+#      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-haproxy.yaml"
+#
+## TO-DO: add task to install and configure DHCP
+#    - name: include task vms to install and configure DHCP
+#      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-dhcp.yaml"
+

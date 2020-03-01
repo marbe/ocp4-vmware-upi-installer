@@ -1,0 +1,20 @@
+---
+- name: Play to test required URI connection
+  hosts: localhost
+  gather_facts: no
+
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-proxy-whitelist.yaml"
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+    - name: Check that you can connect (GET) to a page and it returns a status 200
+      uri:
+        url: "https://{{ item }}"
+        timeout: 5
+        validate_certs: no
+        force: yes
+      environment: "{{ proxy_env }}"
+      loop:
+        "{{ proxy_whitelist }}"
+

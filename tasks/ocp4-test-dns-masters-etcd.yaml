@@ -1,0 +1,21 @@
+- name: dig {{ prefix }}.{{ cluster_name }}.{{ base_domain }} +short
+  command: dig {{ prefix }}.{{ cluster_name }}.{{ base_domain }} +short
+  register: etcdx_IP
+
+#- debug: { msg: "{{ etcdx_IP.stdout }}" }
+
+- name: dig -x {{ etcdx_IP.stdout }} +short
+  command: dig -x {{ etcdx_IP.stdout }} +short
+  register: masterx
+
+#- debug: { msg: "{{ masterx.stdout }}" }
+
+- name: dig {{ masterx.stdout }} +short
+  command: dig {{ masterx.stdout }} +short
+  register: masterx_IP
+
+#- debug: { msg: "{{ masterx_IP.stdout }}" }
+
+- assert:
+    that:
+      -  masterx_IP.stdout == etcdx_IP.stdout

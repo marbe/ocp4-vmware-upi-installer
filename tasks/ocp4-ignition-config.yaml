@@ -1,0 +1,89 @@
+- name: set yum proxy if needed
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: "proxy={{ proxy_env.http_proxy }}"
+    state: present
+  when: proxy_env.http_proxy != ''
+
+- name: unset yum proxy if not needed
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: "proxy={{ proxy_env.http_proxy }}"
+    state: absent
+  when: proxy_env.http_proxy == ''
+
+- name: Create working directory if it does not exist
+  file:
+    path: "{{ work_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: configure install-config
+  template:
+    src: "{{ playbook_dir }}/templates/install-config.yaml.j2"
+    dest: "{{ work_dir}}/install-config.yaml"
+
+- name: Copy install-config.yaml file
+  copy:
+    src: "{{ work_dir}}/install-config.yaml"
+    dest: "{{ work_dir}}/install-config.yaml.copy"
+
+- name: build manifests
+  shell:
+    cmd: /tmp/openshift-install create manifests --dir={{ work_dir}}
+    chdir: "{{ work_dir }}"
+
+- name: unset mastersSchedulable
+  replace:
+    path: "{{ work_dir }}/manifests/cluster-scheduler-02-config.yml"
+    regexp: '(mastersSchedulable:) true'
+    replace: '\1 false'
+
+- name: create ignition-configs
+  shell:
+    cmd: /tmp/openshift-install create ignition-configs --dir={{ work_dir}}
+    chdir: "{{ work_dir }}"
+
+- name: configure append bootstrap
+  template:
+    src: "{{ playbook_dir }}/templates/append-bootstrap.ign.j2"
+    dest: "{{ work_dir}}/append-bootstrap.ign"
+
+- name: install package to run base64 command
+  package:
+    name: coreutils
+    state: present
+
+- name: convert ignition to base64
+  shell:
+    cmd: base64 -w0 {{ work_dir }}/{{item}}.ign > {{ work_dir }}/{{item}}.64
+  loop:
+    - master
+    - worker
+    - append-bootstrap
+
+- name: Change permissions on generated files
+  file:
+    path: "{{ work_dir}}/{{ item }}"
+    mode: '0644'
+  loop:
+    - master.ign
+    - worker.ign
+    - bootstrap.ign
+    - metadata.json
+
+- name: replace ignition payload in vars file
+  replace:
+    path: "{{ playbook_dir }}/vars/ocp4-vars-dynamic.yaml"
+    regexp: '^({{ placeholder }}).*$'
+    replace: '\1: "{{ contents }}"'
+  vars:
+    contents: "{{ lookup('file', '{{ work_dir }}/{{ item }}') }}"
+    placeholder: "{{ item | regex_replace('-', '_') | regex_replace('.64', '_ign') }}"
+  loop:
+    - append-bootstrap.64
+    - master.64
+    - worker.64
+
