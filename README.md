@@ -6,11 +6,14 @@ The aim of this playbooks is to automate the UPI installation steps described in
 ## Pre-requisites
 The minimun pre-requisite is a Red Hat / CentOS server to run this repo's playbooks on, called _bastion_ or _jump host_.
 
-Ansible > 2.8 is required. These playbooks have been developed and tested using ansible 2.9.3.
+Ansible require version on _bastion host_:
 
-DNS, DHCP and Load Balancers can either be installed and configured with provided playbooks, or can be used ad pre-provisioned infrastructure services.
+* ansible > 2.8 is required
+* These playbooks have been developed and tested with **ansible 2.9.3**.
 
-Some playbooks are also provided in order to check that infrastructure pre-requisites are met, specifically those related to DNS records.
+DNS, DHCP and Load Balancers can either be installed with provided playbooks, or can be pre-provisioned as corporate infrastructure services. In this last case they must be configured ad described into [Red Hat OpenShift documentation](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html)
+
+Some playbooks are provided in order to test that infrastructure pre-requisites are met, specifically those related to DNS records.
 
 In order to provision VMs on vmware cluster, [pyvmomi](https://github.com/vmware/pyvmomi) python library is required on _bastion_. Its [installation](https://docs.ansible.com/ansible/latest/scenario_guides/vmware_scenarios/vmware_intro.html) is managed by an included  pre-requisites playbook.
 
@@ -23,8 +26,8 @@ Other useful information are provided within Ansible [VMware Guide](https://docs
 ## Provided Playbooks
 Playbook name | Description
 --- | ---
-`ocp4-playbook-vmware-prereq.yaml` | Install vmware_gues prerequisites (currently pyvmomi)
-`ocp4-playbook-cluster-create.yaml`| Setup the OpenShift 4 cluster manifests (ignition files, certificates) and creates VMs on vmware cluster. ALl VMs are created powered off.
+`ocp4-playbook-vmware-prereq.yaml` | Install vmware_gues prerequisites (currently pyvmomi).
+`ocp4-playbook-cluster-create.yaml`| Setup the OpenShift 4 cluster manifests (ignition files, certificates) and creates VMs on vmware cluster. All VMs are created powered off.
 `ocp4-playbook-poweron-vms.yaml`| Power on OpenShift VMs on vmware cluster.
 `ocp4-playbook-erase-vms.yaml`| Power off and erase OpenShift  VMs on vmware cluster.
 `ocp4-playbook-test-uri.yaml` | Test https get to URI required to install and use OpenShift.
@@ -44,23 +47,31 @@ Playbook name | Description
 
 All playbooks run on localhost. To run them, simply type:
 
-`ansible-playbook <playbook-name>`
+`ansible-playbook <path_to_cloned_repo>/playbooks/<playbook-name>`
 
 ### OpenShift installation directory
-Installation directory is `/tmp/openshift-install-<date +%Y%m%d>`.
+To build openshift installation manifests and run openshift installer, this directory is created ad working directory:
 
-`openshift-install` and `oc` binaries are installed under `/tmp/directory` in such a way that you can follow the installation with:
+`/tmp/openshift-install-<date +%Y%m%d>`
+
+Also:
+* `openshift-install`
+
+and
+* `oc`
+
+binaries are installed under `/tmp/directory` in such a way that, after VMs poweron, you can follow and complete the installation with:
 
 ```
-openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for bootstrap-complete
+/tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for bootstrap-complete
 
 export KUBECONFIG=/tmp/openshift-install-<date +%Y%m%d>/auth/kubeconfig
 
-oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
+/tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 
-oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"managementState": "Managed"}}'
+/tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"managementState": "Managed"}}'
 
-openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for install-complete
+/tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for install-complete
 ```
 
 ## How to contribute
