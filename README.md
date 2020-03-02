@@ -74,6 +74,53 @@ export KUBECONFIG=/tmp/openshift-install-<date +%Y%m%d>/auth/kubeconfig
 /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for install-complete
 ```
 
+### Finding vmware details with govc
+In order to find information related to vmware infrastructure, [govc](https://github.com/vmware/govmomi/tree/master/govc) software can be used:
+```
+$ mkdir ~/bin
+$ export GOVC_URL=https://github.com/vmware/govmomi/releases/download/v0.22.1/govc_linux_amd64.gz
+$ curl -L ${GOVC_URL} | gunzip > ~/bin/govc
+$ chmod +x ~/bin/govc
+
+$ govc version
+govc 0.22.1
+
+$ export GOVC_URL="vcenter.ocplab.net"
+$ export GOVC_USERNAME="<...>"
+$ export GOVC_PASSWORD="<...>"
+$ export GOVC_INSECURE=1
+$ export GOVC_DATASTORE="<...>"
+
+$ govc about
+Name:         VMware vCenter Server
+Vendor:       VMware, Inc.
+Version:      6.7.0
+Build:        8170161
+OS type:      linux-x64
+API type:     VirtualCenter
+API version:  6.7
+Product ID:   vpx
+
+$ govc ls
+/DC1/vm
+/DC1/network
+/DC1/host
+/DC1/datastore
+
+$ govc ls /DC1/network
+/DC1/network/LAN2
+/DC1/network/LAN1
+/DC1/network/WAN1
+
+$ govc ls /DC1/vm
+/DC1/vm/Discovered virtual machine
+/DC1/vm/ocp4
+
+$ govc ls /DC1/vm/ocp4
+/DC1/vm/ocp4/rhcos-4.3.0-x86_64
+```
+
+
 ## How to contribute
 Pull requests are wellcome!
 
