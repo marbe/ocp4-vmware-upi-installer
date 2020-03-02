@@ -18,6 +18,7 @@ vcenter:
   datacenter: ""
   cluster: ""
   datastore: ""
+  network: ""
 ova_template_name: ''
 ###
 

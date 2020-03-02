@@ -24,7 +24,7 @@
       hotremove_cpu: True
       hotadd_memory: False
     networks:
-    - name: LAN1
+    - name: "{{ vcenter.network }}"
     wait_for_ip_address: no
   loop: "{{ nodes }}"
   delegate_to: localhost
@@ -42,7 +42,7 @@
     name: "{{ item.name }}"
     gather_network_info: false
     networks:
-    - name: LAN1
+    - name: "{{ vcenter.network }}"
       label: "Network adapter 1"
       state: present
       manual_mac: "{{ item.mac }}"
