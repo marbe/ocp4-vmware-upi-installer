@@ -22,7 +22,7 @@
 
 - name: configure install-config
   template:
-    src: "{{ playbook_dir }}/templates/install-config.yaml.j2"
+    src: "{{ playbook_dir }}/../templates/install-config.yaml.j2"
     dest: "{{ work_dir}}/install-config.yaml"
 
 - name: Copy install-config.yaml file
@@ -48,7 +48,7 @@
 
 - name: configure append bootstrap
   template:
-    src: "{{ playbook_dir }}/templates/append-bootstrap.ign.j2"
+    src: "{{ playbook_dir }}/../templates/append-bootstrap.ign.j2"
     dest: "{{ work_dir}}/append-bootstrap.ign"
 
 - name: install package to run base64 command
@@ -76,7 +76,7 @@
 
 - name: replace ignition payload in vars file
   replace:
-    path: "{{ playbook_dir }}/vars/ocp4-vars-dynamic.yaml"
+    path: "{{ playbook_dir }}/../vars/ocp4-vars-dynamic.yaml"
     regexp: '^({{ placeholder }}).*$'
     replace: '\1: "{{ contents }}"'
   vars:
