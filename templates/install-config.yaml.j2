@@ -18,15 +18,17 @@ metadata:
   name: {{ cluster_name }}
 platform:
   vsphere:
-    vcenter: {{ vcenter.hostname }}
-    username: {{ vcenter.username }}
-    password: {{ vcenter.password }}
-    datacenter: {{ vcenter.datacenter }}
-    defaultDatastore: {{ vcenter.datastore }}
+    vcenter: '{{ vcenter.hostname }}'
+    username: '{{ vcenter.username }}'
+    password: '{{ vcenter.password }}'
+    datacenter: '{{ vcenter.datacenter }}'
+    defaultDatastore: '{{ vcenter.datastore }}'
 fips: false
 networking:
   networkType: {{ openshift.networkType }}
+  {% if openshift.machineCIDR %}
   machineCIDR: {{ openshift.machineCIDR }}
+  {% endif %}
   clusterNetworks:
   - cidr: {{ openshift.clusterNetwork.cidr }}
     hostPrefix: {{ openshift.clusterNetwork.hostPrefix}}

@@ -6,16 +6,26 @@ The aim of this playbooks is to automate the UPI installation steps described in
 ## Pre-requisites
 The minimun pre-requisite is a Red Hat / CentOS server to run this repo's playbooks on, called _bastion_ or _jump host_.
 
+DNS, DHCP and Load Balancers can either be installed with provided playbooks, or can be pre-provisioned as corporate infrastructure services. In this last case they must be configured ad described into [Red Hat OpenShift documentation](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html)
+
+Playbooks have been developed and tested on RHEL 7. While most thing will work on RHEL 8 also, this version has not been tested yet.
+
+### Ansible
 Ansible require version on _bastion host_:
 
 * ansible > 2.8 is required
 * These playbooks have been developed and tested with **ansible 2.9.3**.
 
-DNS, DHCP and Load Balancers can either be installed with provided playbooks, or can be pre-provisioned as corporate infrastructure services. In this last case they must be configured ad described into [Red Hat OpenShift documentation](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html)
-
 Some playbooks are provided in order to test that infrastructure pre-requisites are met, specifically those related to DNS records.
 
-In order to provision VMs on vmware cluster, [pyvmomi](https://github.com/vmware/pyvmomi) python library is required on _bastion_. Its [installation](https://docs.ansible.com/ansible/latest/scenario_guides/vmware_scenarios/vmware_intro.html) is managed by an included  pre-requisites playbook.
+### Python pip and pyvmomi
+In order to provision VMs on vmware cluster, [pyvmomi](https://github.com/vmware/pyvmomi) python library is required on _bastion_.
+
+At first, you will need to install python pip on your system. You can do it by:
+1. enabling `epel` package repository using `epel-enable-playbook.yaml`
+1. running:  `# yum install python-pip`
+
+Finally, **[`pvvmomi`](https://docs.ansible.com/ansible/latest/scenario_guides/vmware_scenarios/vmware_intro.html)**  installation can be managed by the specific pre-requisites playbook (`epel-enable-playbook.yaml`). 
 
 ### vSphere Permissions
 vSphere permissions required from OpenShift installer to properly configure vsphere storageclass are detailed on [vmware vsphere storage for kubernetes page](https://vmware.github.io/vsphere-storage-for-kubernetes/documentation/vcp-roles.html).
@@ -119,6 +129,10 @@ $ govc ls /DC1/vm
 $ govc ls /DC1/vm/ocp4
 /DC1/vm/ocp4/rhcos-4.3.0-x86_64
 ```
+
+## To Do
+* Add Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
+* Add configuration for static IP in a supported way.
 
 
 ## How to contribute

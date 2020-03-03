@@ -12,4 +12,4 @@
     force: yes
   loop: "{{ nodes }}"
   delegate_to: localhost
-  tags: poweron_vm
+

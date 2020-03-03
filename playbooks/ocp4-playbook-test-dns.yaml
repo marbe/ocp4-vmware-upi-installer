@@ -48,5 +48,5 @@
         node: "{{ item.node }}"
         addr: "{{ item.addr }}"
       loop: "{{ workers }}"
-      tags: testworkers
+      tags: ocp4-test-dns-workers
 

@@ -1,0 +1,16 @@
+- name: set yum proxy if needed
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: "proxy={{ proxy_env.http_proxy }}"
+    state: present
+  when: use_proxy_for_yum|bool
+
+- name: unset yum proxy if not needed
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^proxy='
+    line: "proxy={{ proxy_env.http_proxy }}"
+    state: absent
+  when: not use_proxy_for_yum
+

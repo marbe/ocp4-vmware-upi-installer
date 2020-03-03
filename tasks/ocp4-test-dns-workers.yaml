@@ -1,18 +1,15 @@
 - name: dig {{ node }} +short
   command: dig {{ node }} +short
   register: node_IP
-  tags: testworkers
-
 
 - name: dig -x {{ addr }} +short
   command: dig -x {{ addr }} +short
   register: addr_NAME
-  tags: testworkers
 
 - assert:
     that:
       - node_IP.stdout == "{{ addr }}"
       - addr_NAME.stdout == "{{ node }}."
-    success_msg: "{{ node }} correctly resolve to {{ addr }} and vice-versa"
-    fail_msg: "PROBLEM while resolving {{ node }} to {{ addr }} or vice-versa"
-  tags: testworkers
+    success_msg: "{{ node }} correctly resolve to {{ addr }} and vice-versa"
+    fail_msg: "PROBLEM while resolving {{ node }} to {{ addr }} or vice-versa"
+

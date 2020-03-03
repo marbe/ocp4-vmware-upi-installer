@@ -14,13 +14,11 @@ proxy_whitelist:
   - apache.org
   - npmjs.com
   - openshift.io
-  - openshift.org
+  - okd.io
   - rubygems.org
   - cpan.org
   - githubapp.com
   - fabric8.io
-  - jboss.org
-  - jenkins-ci.org
   - jenkins.io
   - bintray.com
   - spring.io
@@ -34,3 +32,4 @@ proxy_whitelist:
   - mirror.openshift.com
   - api.openshift.com
   - cloud.redhat.com
+  - pypi.org

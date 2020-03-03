@@ -12,15 +12,21 @@
         that:
           - "ansible_os_family == 'RedHat'"
 
-    - name: include task vms for client setup
+    - name: include task for client setup
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-client-setup.yaml"
+      tags: ocp4-client-setup.yaml
+
+    - name: include task for yum proxy setup
+      include_tasks: "{{ playbook_dir }}/../tasks/yum_set_proxy.yaml"
+      tags: yum_set_proxy
 
     - name: include task vms for ignition config
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-ignition-config.yaml"
+      tags: ocp4-ignition-config
 
     - name: include task vms for httpd ignition providing
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-httpd-ignition-provide.yaml"
-      tags: "ocp-httpd-ignition-provide"
+      tags: ocp4-httpd-ignition-provide
 
     - name: Include vars for ignition files
       include_vars:
@@ -31,16 +37,19 @@
       vars:
         nodes: "{{ bootstrap }}"
         ignition_payload: "{{ append_bootstrap_ign }}"
+      tags: vmware
 
     - name: include create task vms for masters node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
       vars:
         nodes: "{{ masters }}"
         ignition_payload: "{{ master_ign }}"
+      tags: vmware
 
     - name: include create task vms for workers node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
       vars:
         nodes: "{{ workers }}"
         ignition_payload: "{{ worker_ign }}"
+      tags: vmware
 

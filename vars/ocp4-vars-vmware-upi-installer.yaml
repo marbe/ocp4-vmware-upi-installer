@@ -43,6 +43,7 @@ proxy_env:
   http_proxy: ''
   https_proxy: ''
   no_proxy: ''
+use_proxy_for_yum: no
 
 pull_secret: ''
 

@@ -6,7 +6,6 @@
     - "{{ client_linux }}"
     - "{{ install_linux }}"
   environment: "{{ proxy_env }}"
-  tags: ocp-client-setup
 
 - name: Extract openshift clients
   unarchive:
@@ -15,4 +14,4 @@
   loop:
     - "{{ client_linux }}"
     - "{{ install_linux }}"
-  tags: ocp-client-setup
+
