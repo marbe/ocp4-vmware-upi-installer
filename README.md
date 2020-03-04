@@ -42,6 +42,7 @@ Playbook name | Description
 `ocp4-playbook-erase-vms.yaml`| Power off and erase OpenShift  VMs on vmware cluster.
 `ocp4-playbook-test-uri.yaml` | Test https get to URI required to install and use OpenShift.
 `ocp4-playbook-test-dns.yaml`| Test for proper DNS records configuration.
+`ocp4-playbook-boot_delay-vms.yaml`| Configure Boot Delay for VMs in order to let the possibility to press the TAB or E key to edit the kernel command line. 
 `epel-enable-playbook.yaml`| Playbook to enable epel repository if needed (e.g. to install `ansible` from epel or `nagios-plugins-dhcp` to debug dhcp configuration).
 `infrastructure-services-setup.yaml`| TO-DO: Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
 
@@ -83,6 +84,13 @@ export KUBECONFIG=/tmp/openshift-install-<date +%Y%m%d>/auth/kubeconfig
 
 /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for install-complete
 ```
+
+## Installation with static IP
+At the time of writing this project, **static IP** address setting for vmware UPI installation is not documented on public documentation. Anyway the supported procedure is the very same of baremetal scenario.
+
+The supported procedure consists of **modifying first boot kernel parameters** by editing the kernel command line, as described [here](https://docs.openshift.com/container-platform/4.3/installing/installing_bare_metal/installing-bare-metal-network-customizations.html#installation-user-infra-machines-iso_installing-bare-metal-network-customizations).
+
+In order to let the time to press the TAB or E key after powering up VM on vcenter console, you can use the `ocp4-playbook-boot_delay-vms.yaml` playbook that configures Boot Delay VMs parameter (default 10s).
 
 ### Finding vmware details with govc
 In order to find information related to vmware infrastructure, [govc](https://github.com/vmware/govmomi/tree/master/govc) software can be used:
@@ -132,8 +140,6 @@ $ govc ls /DC1/vm/ocp4
 
 ## To Do
 * Add Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
-* Add configuration for static IP in a supported way.
-
 
 ## How to contribute
 Pull requests are wellcome!
