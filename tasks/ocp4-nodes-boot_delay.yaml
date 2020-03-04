@@ -1,0 +1,11 @@
+- name: Change virtual machine's boot_delay
+  vmware_guest_boot_manager:
+    hostname: "{{ vcenter.hostname }}"
+    username: "{{ vcenter.username }}"
+    password: "{{ vcenter.password }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    boot_delay: "{{ vm_boot_delay }}"
+  loop: "{{ nodes }}"
+  delegate_to: localhost
+  tags: vmware-boot_delay

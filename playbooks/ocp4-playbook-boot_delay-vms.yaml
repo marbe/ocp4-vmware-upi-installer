@@ -1,0 +1,25 @@
+---
+- name: Play to set boot_delay for VMs of OCP cluster
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+
+    - name: include set boot_delay task for bootstrap node
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-boot_delay.yaml"
+      vars:
+        nodes: "{{ bootstrap }}"
+
+    - name: include set boot_delay task for masters node
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-boot_delay.yaml"
+      vars:
+        nodes: "{{ masters }}"
+      tags: skip
+
+    - name: include set boot_delay task for workers node
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-boot_delay.yaml"
+      vars:
+        nodes: "{{ workers }}"
+      tags: skip

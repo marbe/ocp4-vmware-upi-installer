@@ -26,9 +26,9 @@ platform:
 fips: false
 networking:
   networkType: {{ openshift.networkType }}
-  {% if openshift.machineCIDR %}
+{% if openshift.machineCIDR %}
   machineCIDR: {{ openshift.machineCIDR }}
-  {% endif %}
+{% endif %}
   clusterNetworks:
   - cidr: {{ openshift.clusterNetwork.cidr }}
     hostPrefix: {{ openshift.clusterNetwork.hostPrefix}}
