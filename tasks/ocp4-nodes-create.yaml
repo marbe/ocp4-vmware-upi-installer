@@ -28,7 +28,7 @@
     wait_for_ip_address: no
   loop: "{{ nodes }}"
   delegate_to: localhost
-  register: deploy
+  tags: vmware
 
 - name: Configure MAC address
   vmware_guest_network:
@@ -48,7 +48,7 @@
       manual_mac: "{{ item.mac }}"
   loop: "{{ nodes }}"
   delegate_to: localhost
-  register: network_info
+  tags: vmware
 
 - name: Configure VAPP properties
   vmware_guest:
@@ -70,5 +70,5 @@
       value: "TRUE"
   loop: "{{ nodes }}"
   delegate_to: localhost
-  register: guest_info
+  tags: vmware
 
