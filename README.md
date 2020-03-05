@@ -74,15 +74,15 @@ and
 binaries are installed under `/tmp/directory` in such a way that, after VMs poweron, you can follow and complete the installation with:
 
 ```
-/tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for bootstrap-complete
+$ /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for bootstrap-complete
 
-export KUBECONFIG=/tmp/openshift-install-<date +%Y%m%d>/auth/kubeconfig
+$ export KUBECONFIG=/tmp/openshift-install-<date +%Y%m%d>/auth/kubeconfig
 
-/tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
+$ /tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 
-/tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"managementState": "Managed"}}'
+$ /tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"managementState": "Managed"}}'
 
-/tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for install-complete
+$ /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for install-complete
 ```
 
 ## Installation with static IP
