@@ -8,4 +8,3 @@
     boot_delay: "{{ vm_boot_delay }}"
   loop: "{{ nodes }}"
   delegate_to: localhost
-  tags: vmware-boot_delay

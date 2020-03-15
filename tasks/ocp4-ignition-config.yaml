@@ -4,36 +4,51 @@
     state: directory
     mode: '0755'
 
+- name: Verify if install-config already run
+  stat:
+    path: "{{ work_dir }}/master.ign"
+  register: manifest_ign
+
+- debug:
+    msg: "{{ work_dir }} has already been initialized. Please delete it if you want to re-initialize."
+  when: manifest_ign.stat.exists
+
 - name: configure install-config
   template:
     src: "{{ playbook_dir }}/../templates/install-config.yaml.j2"
     dest: "{{ work_dir}}/install-config.yaml"
+  when: manifest_ign.stat.exists == false
 
 - name: Copy install-config.yaml file
   copy:
     src: "{{ work_dir}}/install-config.yaml"
     dest: "{{ work_dir}}/install-config.yaml.copy"
+  when: manifest_ign.stat.exists == false
 
 - name: build manifests
   shell:
     cmd: /tmp/openshift-install create manifests --dir={{ work_dir}}
     chdir: "{{ work_dir }}"
+  when: manifest_ign.stat.exists == false
 
 - name: unset mastersSchedulable
   replace:
     path: "{{ work_dir }}/manifests/cluster-scheduler-02-config.yml"
     regexp: '(mastersSchedulable:) true'
     replace: '\1 false'
+  when: manifest_ign.stat.exists == false
 
 - name: create ignition-configs
   shell:
     cmd: /tmp/openshift-install create ignition-configs --dir={{ work_dir}}
     chdir: "{{ work_dir }}"
+  when: manifest_ign.stat.exists == false
 
 - name: configure append bootstrap
   template:
     src: "{{ playbook_dir }}/../templates/append-bootstrap.ign.j2"
     dest: "{{ work_dir}}/append-bootstrap.ign"
+  when: manifest_ign.stat.exists == false
 
 - name: install package to run base64 command
   package:
@@ -47,6 +62,8 @@
     - master
     - worker
     - append-bootstrap
+  when: manifest_ign.stat.exists == false
+  tags: replaceign
 
 - name: Change permissions on generated files
   file:
@@ -57,6 +74,13 @@
     - worker.ign
     - bootstrap.ign
     - metadata.json
+  when: manifest_ign.stat.exists == false
+
+- name: create ocp4-vars-dynamic.yaml empty var file
+  template:
+    src: "{{ playbook_dir }}/../templates/ocp4-vars-dynamic.yaml.j2"
+    dest: "{{ playbook_dir }}/../vars/ocp4-vars-dynamic.yaml"
+  tags: replaceign
 
 - name: replace ignition payload in vars file
   replace:
@@ -70,4 +94,5 @@
     - append-bootstrap.64
     - master.64
     - worker.64
+  tags: replaceign
 

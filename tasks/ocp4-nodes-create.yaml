@@ -46,6 +46,8 @@
       label: "Network adapter 1"
       state: present
       manual_mac: "{{ item.mac }}"
+## This value is required if multiple distributed portgroups exists.
+#      dvswitch_name: "{{ vcenter.dvswitch_name }}"
   loop: "{{ nodes }}"
   delegate_to: localhost
   tags: vmware
@@ -66,8 +68,9 @@
       value: "base64"
     - id: "guestinfo.ignition.config.data"
       value: "{{ ignition_payload }}"
-    - id: "disk.EnableUUID"
-      value: "TRUE"
+## This has been commented out because it is not effective at this level. It MUST BE configured as VM Option into the VM temlpate imported from OVA.
+#    - id: "disk.EnableUUID"
+#      value: "TRUE"
   loop: "{{ nodes }}"
   delegate_to: localhost
   tags: vmware

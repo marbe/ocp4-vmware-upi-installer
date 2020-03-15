@@ -1,0 +1,17 @@
+- name: dig -x {{ addr }} +short
+  command: dig -x {{ addr }} +short
+  register: addr_NAME
+  tags: ocp4-test-dns-nodes
+
+- name: dig {{ addr_NAME.stdout }} +short
+  command: dig {{ addr_NAME.stdout }} +short
+  register: node_IP
+  tags: ocp4-test-dns-nodes
+
+- assert:
+    that:
+      - node_IP.stdout == "{{ addr }}"
+    success_msg: "{{ addr_NAME.stdout }} correctly resolve to {{ addr }} and vice-versa"
+    fail_msg: "PROBLEM while resolving {{ addr }}"
+  tags: ocp4-test-dns-nodes
+

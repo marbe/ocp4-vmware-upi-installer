@@ -11,11 +11,13 @@
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-poweron.yaml"
       vars:
         nodes: "{{ bootstrap }}"
+      tags: skip
 
     - name: include poweron task vms for masters node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-poweron.yaml"
       vars:
         nodes: "{{ masters }}"
+      tags: skip
 
     - name: include poweron task vms for workers node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-poweron.yaml"

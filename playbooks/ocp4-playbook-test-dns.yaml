@@ -3,14 +3,25 @@
   hosts:
     - localhost
   gather_facts: no
+  become: yes
 
   vars_files:
     - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
-    - "{{ playbook_dir }}/../vars/workers-list.yaml"
 
   tasks:
+    - name: install dns and network utils
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - bind-utils
+        - net-tools
+        - telnet
+        - curl
+        - wget
+
     - name: include task to test VIP records
-      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-records.yaml"
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-VIPS.yaml"
       vars:
         record: "{{ item }}"
       loop:
@@ -42,11 +53,24 @@
         - etcd-1
         - etcd-2
 
-    - name: test workers
-      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-workers.yaml"
+    - name: test bootstrap
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-nodes.yaml"
       vars:
-        node: "{{ item.node }}"
-        addr: "{{ item.addr }}"
+        addr: "{{ item.ip }}"
+      loop: "{{ bootstrap }}"
+      tags: ocp4-test-dns-nodes
+
+    - name: test masters
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-nodes.yaml"
+      vars:
+        addr: "{{ item.ip }}"
+      loop: "{{ masters }}"
+      tags: ocp4-test-dns-nodes
+
+    - name: test workers
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-nodes.yaml"
+      vars:
+        addr: "{{ item.ip }}"
       loop: "{{ workers }}"
-      tags: ocp4-test-dns-workers
+      tags: ocp4-test-dns-nodes
 

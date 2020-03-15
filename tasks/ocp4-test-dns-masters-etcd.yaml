@@ -10,12 +10,12 @@
 
 #- debug: { msg: "{{ masterx.stdout }}" }
 
-- name: dig {{ masterx.stdout }} +short
-  command: dig {{ masterx.stdout }} +short
+- name: dig {{  masterx.stdout }} +short
+  command: dig {{ masterx.stdout }} +short
   register: masterx_IP
 
 #- debug: { msg: "{{ masterx_IP.stdout }}" }
 
 - assert:
     that:
-      -  masterx_IP.stdout == etcdx_IP.stdout
+      - masterx_IP.stdout == etcdx_IP.stdout

@@ -1,16 +1,24 @@
 ---
-### General variables to set working environment
-# directory to store openshift installation files
+############## General variables to set working environment - BEGIN
+# Directory to store openshift installation files:
 work_dir: "/tmp/openshift-install-{{ lookup('pipe','date +%Y%m%d') }}"
-openshift_clients_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.3"
-client_linux: "openshift-client-linux-4.3.1.tar.gz"
-install_linux: "openshift-install-linux-4.3.1.tar.gz"
-# httpd server port to provide ignition file (SElinux compatible)
+ocp_version: 4.3.5
+openshift_clients_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ ocp_version }}"
+client_linux: "openshift-client-linux-{{ ocp_version }}.tar.gz"
+install_linux: "openshift-install-linux-{{ ocp_version }}.tar.gz"
+# httpd server port to provide ignition file (SElinux compatible):
 httpd_port: 8008
 document_root: "/var/www/html"
-###
+# Proxy must be in the form: http://<address>:<port> - Add vCenter address within noproxy variable if required:
+proxy_env:
+  http_proxy: ''
+  https_proxy: ''
+  no_proxy: ''
+use_proxy_for_yum: no
 
-### vmware vCenter related variables
+############## General variables to set working environment - END
+
+############## VMware vCenter variables - BEGIN
 vcenter:
   hostname: ""
   username: ""
@@ -19,47 +27,60 @@ vcenter:
   cluster: ""
   datastore: ""
   network: ""
+# Variable required if multiple distributed portgroups exists:
+#  dvswitch_name: ""
 ova_template_name: ''
-###
+vm_boot_delay: 10000
+############## VMware vCenter variables - END
 
-### Openshift ignition files setup related variables
+################## Parameters used for install-config.yaml file - BEGIN
+# base_domain of ocp4 cluster and cluster_name: 
+base_domain: ""
+cluster_name: ""
+
 openshift:
   networkType: "OpenShiftSDN"
   clusterNetwork:
     cidr: "10.128.0.0/14"
     hostPrefix: "23"
   serviceNetwork: "172.30.0.0/16"
-# This is the subnet in which OCP nodes are installed
-  machineCIDR: ""
-
-base_domain: ""
-cluster_name: ""
-
-bootstrap_ignition_config_url: "http://{{ ansible_default_ipv4.address }}:{{ httpd_port }}/bootstrap.ign"
-
-# Proxy must be in the form: http://<address>:<port>
-# Please remember to add vcenter address within noproxy variable if required
-proxy_env:
-  http_proxy: ''
-  https_proxy: ''
-  no_proxy: ''
-use_proxy_for_yum: no
+  machineCIDR: "192.168.100.0/24"
 
 pull_secret: ''
 
 ssh_key: ''
-###
 
-### OpenShift Nodes details to provision VMs on vmware vCenter:
+bootstrap_ignition_config_url: "http://{{ ansible_default_ipv4.address }}:{{ httpd_port }}/bootstrap.ign"
+################## Parameters used for install-config.yaml file - END
+
+#######################  Variables below for DNS & DHCP server setup - BEGIN
+machineCIDR_netmask: "255.255.255.0"
+machineCIDR_first_ip: "{{ openshift.machineCIDR | regex_replace('^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/[0-9]{1,2}', '\\1') }}"
+machineCIDR_first_three_octects: "{{ machineCIDR_first_ip | regex_replace('^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})\\.[0-9]{1,3}$', '\\1') }}"
+machineCIDR_first_three_octects_reverse: "{{ machineCIDR_first_three_octects | regex_replace('^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})$', '\\3.\\2.\\1') }}"
+# usually default GW is the first or the last address of the range:
+machineCIDR_default_gw: "{{ machineCIDR_first_three_octects }}.1"
+# this should be set to corporate DNS
+dns_forwarder: "8.8.8.8"
+#######################  Variables below for DNS & DHCP server setup - END
+
+################## OpenShift Nodes details to provision VMs on vmware vCenter - BEGIN
+# 'ip' attribute is used to test correct DNS configuration and to setup DHCP & DNS if required.
+# 'mac_range_start' and 'mac' attributes must be changed according to corporate rules, within VMware MAC range.
+# Minimum setup consists of one bootstrap, three masters and two workers.
+# More workers can be added by adding more lines in 'workers:' list. PLEASE MODIFY named and dhcpd templates ACCORDINGLY if DHCP & DNS setup is required.
+mac_range_start: 00:50:56:00:22
+
 bootstrap:
-- { name: "bootstrap-01", mac: "", disk: "120", memory: "16384", cpu: "4" }
+- { name: "bootstrap", mac: "{{ mac_range_start }}:00", ip: "{{ machineCIDR_first_three_octects }}.100", disk: "120", memory: "16384", cpu: "4" }
 
 masters:
-- { name: "master-01", mac: "", disk: "120", memory: "16384", cpu: "4" }
-- { name: "master-02", mac: "", disk: "120", memory: "16384", cpu: "4" }
-- { name: "master-03", mac: "", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master01", mac: "{{ mac_range_start }}:01", ip: "{{ machineCIDR_first_three_octects }}.101", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master02", mac: "{{ mac_range_start }}:02", ip: "{{ machineCIDR_first_three_octects }}.102", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master03", mac: "{{ mac_range_start }}:03", ip: "{{ machineCIDR_first_three_octects }}.103", disk: "120", memory: "16384", cpu: "4" }
 
 workers:
-- { name: "worker-01", mac: "", disk: "120", memory: "8192", cpu: "2" }
-- { name: "worker-02", mac: "", disk: "120", memory: "8192", cpu: "2" }
-###
+- { name: "worker01", mac: "{{ mac_range_start }}:04", ip: "{{ machineCIDR_first_three_octects }}.104", disk: "120", memory: "8192", cpu: "2" }
+- { name: "worker02", mac: "{{ mac_range_start }}:05", ip: "{{ machineCIDR_first_three_octects }}.105", disk: "120", memory: "8192", cpu: "2" }
+################## OpenShift Nodes details to provision VMs on vmware vCenter - END
+

@@ -14,19 +14,16 @@
 
     - name: include task for client setup
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-client-setup.yaml"
-      tags: ocp4-client-setup
 
     - name: include task for yum proxy setup
       include_tasks: "{{ playbook_dir }}/../tasks/yum_set_proxy.yaml"
-      tags: yum_set_proxy
 
     - name: include task vms for ignition config
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-ignition-config.yaml"
-      tags: ocp4-ignition-config
+      tags: replaceign
 
-    - name: include task vms for httpd ignition providing
+    - name: include task for httpd ignition providing
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-httpd-ignition-provide.yaml"
-      tags: ocp4-httpd-ignition-provide
 
     - name: Include vars for ignition files
       include_vars:

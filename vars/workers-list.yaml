@@ -1,7 +1,0 @@
-workers:
-  - node:
-    addr:
-  - node:
-    addr:
-  - node:
-    addr:

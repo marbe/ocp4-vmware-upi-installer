@@ -1,0 +1,30 @@
+- name: install dhcp
+  package:
+    name: dhcp
+    state: present
+
+- name: configure dhcp.conf from template
+  template:
+    src: "{{ playbook_dir }}/../templates/dhcpd.conf.j2"
+    dest: "/etc/dhcp/dhcpd.conf"
+  notify:
+    - restart dhcpd
+
+- name: ensure dhcpd is running
+  service:
+    name: dhcpd
+    state: started
+    enabled: yes
+
+- name: populate service facts
+  service_facts:
+
+- name: Allow infrastructure services on firewall
+  firewalld:
+    service: dhcp
+    permanent: yes
+    state: enabled
+    immediate: yes
+    zone: public
+  when: ansible_facts.services['firewalld.service'].status == 'enabled'
+

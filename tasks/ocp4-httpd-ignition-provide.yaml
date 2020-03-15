@@ -21,3 +21,14 @@
     dest: "{{ document_root }}/bootstrap.ign"
     force: yes
 
+- name: populate service facts
+  service_facts:
+
+- name: Open ports for infrastructure services on firewall
+  firewalld:
+    port: "{{ httpd_port }}/tcp"
+    permanent: yes
+    state: enabled
+    immediate: yes
+    zone: public
+  when: ansible_facts.services['firewalld.service'].status == 'enabled'

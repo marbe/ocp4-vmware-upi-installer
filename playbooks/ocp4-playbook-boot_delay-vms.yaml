@@ -16,10 +16,8 @@
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-boot_delay.yaml"
       vars:
         nodes: "{{ masters }}"
-      tags: skip
 
     - name: include set boot_delay task for workers node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-boot_delay.yaml"
       vars:
         nodes: "{{ workers }}"
-      tags: skip

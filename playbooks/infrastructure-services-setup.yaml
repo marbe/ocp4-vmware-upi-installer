@@ -12,18 +12,14 @@
         that:
           - "ansible_os_family == 'RedHat'"
 
-    - name: include task for security configurations (firewalld and selinux)
-      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-security-tasks.yaml"
+    - name: include task for 
+      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-dhcp.yaml"
 
-## TO-DO: add task to install and configure DNS
-#    - name: include task vms to install and configure DNS
-#      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-bind.yaml"
-#
-## TO-DO: add task to install and configure LB
-#    - name: include task vms to install and configure LB
-#      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-haproxy.yaml"
-#
-## TO-DO: add task to install and configure DHCP
-#    - name: include task vms to install and configure DHCP
-#      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-dhcp.yaml"
+    - name: include task for 
+      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-named.yaml"
 
+    - name: include task for 
+      include_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-haproxy.yaml"
+
+  handlers:
+    - import_tasks: "{{ playbook_dir }}/../tasks/infrastructure-services-handlers.yaml"

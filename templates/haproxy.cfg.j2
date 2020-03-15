@@ -1,0 +1,121 @@
+#---------------------------------------------------------------------
+# Example configuration for a possible web application.  See the
+# full configuration options online.
+#
+#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
+#
+#---------------------------------------------------------------------
+
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    # to have these messages end up in /var/log/haproxy.log you will
+    # need to:
+    #
+    # 1) configure syslog to accept network log events.  This is done
+    #    by adding the '-r' option to the SYSLOGD_OPTIONS in
+    #    /etc/sysconfig/syslog
+    #
+    # 2) configure local2 events to go to the /var/log/haproxy.log
+    #   file. A line like the following can be added to
+    #   /etc/sysconfig/syslog
+    #
+    #    local2.*                       /var/log/haproxy.log
+    #
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+listen stats # Define a listen section called "stats"
+  bind :5555 # Listen on localhost:9000
+  mode http
+  stats enable  # Enable stats page
+  stats realm Haproxy\ Statistics  # Title text for popup window
+  stats uri /haproxy_stats  # Stats URI
+
+#---------------------------------------------------------------------
+# OCP4
+#---------------------------------------------------------------------
+frontend openshift-api-server
+    bind {{ ansible_default_ipv4.address }}:6443
+    default_backend openshift-api-server
+    mode tcp
+    option tcplog
+
+backend openshift-api-server
+    balance source
+    mode tcp
+    server bootstrap {{ bootstrap[0].ip }}:6443 check
+    server master01  {{ masters[0].ip }}:6443 check
+    server master02  {{ masters[1].ip }}:6443 check
+    server master03  {{ masters[2].ip }}:6443 check
+
+frontend machine-config-server
+    bind {{ ansible_default_ipv4.address }}:22623
+    default_backend machine-config-server
+    mode tcp
+    option tcplog
+
+backend machine-config-server
+    balance source
+    mode tcp
+    server bootstrap {{ bootstrap[0].ip }}:22623 check
+    server master01  {{ masters[0].ip }}:22623 check
+    server master02  {{ masters[1].ip }}:22623 check
+    server master03  {{ masters[2].ip }}:22623 check
+
+frontend ingress-http
+    bind {{ ansible_default_ipv4.address }}:80
+    default_backend ingress-http
+    mode tcp
+    option tcplog
+
+backend ingress-http
+    balance source
+    mode tcp
+    server {{ workers[0].name }}  {{ workers[0].ip }}:80 check
+    server {{ workers[1].name }}  {{ workers[1].ip }}:80 check
+
+frontend ingress-https
+    bind {{ ansible_default_ipv4.address }}:443
+    default_backend ingress-https
+    mode tcp
+    option tcplog
+
+backend ingress-https
+    balance source
+    mode tcp
+    server {{ workers[0].name }}  {{ workers[0].ip }}:443 check
+    server {{ workers[1].name }}  {{ workers[1].ip }}:443 check
+

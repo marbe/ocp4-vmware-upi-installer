@@ -1,22 +1,30 @@
-- name: print a message if selinux is enabled
-  debug: msg="selinux is enabled"
-  when: ansible_selinux|bool
+- name: install haproxy
+  package:
+    name: haproxy
+    state: present
 
 - name: populate service facts
   service_facts:
 
-- debug:
-    var: ansible_facts.services['firewalld.service']
-
-- name: Set selinux named and haproxy flags on and keep them persistent across reboots
+- name: Set selinux haproxy flag on and keep them persistent across reboots
   seboolean:
-    name: "{{ item }}"
+    name: haproxy_connect_any
     state: yes
     persistent: yes
-  loop:
-    - named_write_master_zones
-    - haproxy_connect_any
-  when: ansible_selinux|bool
+  when: ansible_selinux.status == "enabled"
+
+- name: ensure haproxy is running
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+
+- name: configure haproxy.cfg from template
+  template:
+    src: "{{ playbook_dir }}/../templates/haproxy.cfg.j2"
+    dest: "/etc/haproxy/haproxy.cfg"
+  notify:
+    - restart haproxy
 
 - name: Allow infrastructure services on firewall
   firewalld:
@@ -28,8 +36,6 @@
   loop:
     - http
     - https
-    - dns
-    - dhcp
   when: ansible_facts.services['firewalld.service'].status == 'enabled'
 
 - name: Open ports for infrastructure services on firewall
@@ -43,5 +49,5 @@
     - "5555/tcp"
     - "22623/tcp"
     - "6443/tcp"
-    - "{{ httpd_port }}"
   when: ansible_facts.services['firewalld.service'].status == 'enabled'
+

@@ -1,16 +1,27 @@
 ### List of pre-requisites URI to install OCP4
 
-proxy_whitelist:
-  - redhat.com
-  - registry.access.redhat.com
+proxy_whitelist_mandatory:
   - registry.redhat.io
   - quay.io
   - sso.redhat.com
+  - cert-api.access.redhat.com
+  - api.access.redhat.com
+  - infogw.api.openshift.com
+  - cloud.redhat.com
+  - mirror.openshift.com
+  - api.openshift.com
+  - redhat.com
+  - registry.access.redhat.com
   - docker.io
   - docker.com
   - hub.docker.com
   - index.docker.io
   - github.com
+  - pypi.org
+  - python.org
+  - pythonhosted.org
+
+proxy_whitelist_optional:
   - apache.org
   - npmjs.com
   - openshift.io
@@ -26,10 +37,3 @@ proxy_whitelist:
   - fusesource.com
   - centos.org
   - cloudflare.com
-  - cert-api.access.redhat.com
-  - api.access.redhat.com
-  - infogw.api.openshift.com
-  - mirror.openshift.com
-  - api.openshift.com
-  - cloud.redhat.com
-  - pypi.org

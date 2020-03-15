@@ -1,0 +1,19 @@
+$ORIGIN {{ machineCIDR_first_three_octects_reverse }}.in-addr.arpa.
+$TTL 86400              ; 1 day
+@       IN      SOA     ns01.{{ base_domain }}. admin.{{ base_domain }}. (
+                  2     ; Serial
+               7200     ; refresh (2 hous)
+               7200     ; retry (2 hours)
+            2419200     ; expire (5 weeks 6 days 16 hours)
+              86400 )   ; minimum (1 day)
+
+{{ machineCIDR_first_three_octects_reverse }}.in-addr.arpa. IN NS ns01.{{ base_domain }}.
+
+{{ ansible_default_ipv4.address | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}      IN     PTR     ns01.{{ base_domain }}.
+
+{{ bootstrap[0].ip | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}     IN     PTR     {{ bootstrap[0].name }}.{{ base_domain }}.
+{{ masters[0].ip | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}     IN     PTR     {{ masters[0].name }}.{{ base_domain }}.
+{{ masters[1].ip | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}     IN     PTR     {{ masters[1].name }}.{{ base_domain }}.
+{{ masters[2].ip | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}     IN     PTR     {{ masters[2].name }}.{{ base_domain }}.
+{{ workers[0].ip | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}     IN     PTR     {{ workers[0].name }}.{{ base_domain }}.
+{{ workers[1].ip | regex_replace('^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.([0-9]{1,3})$', '\\1') }}     IN     PTR     {{ workers[1].name }}.{{ base_domain }}.

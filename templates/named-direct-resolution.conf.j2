@@ -1,0 +1,37 @@
+$TTL 300                ; 5 minutes
+@       IN      SOA     ns01.{{ base_domain }}. admin.{{ base_domain }}. (
+                  4     ; Serial
+                  0     ; Refresh
+                300     ; Retry
+                  0     ; Expire
+                300 )   ; Negative Cache TTL
+
+; name servers - NS records
+@                     IN     NS    ns01.{{ base_domain }}.
+; name servers - A records
+ns01.{{ base_domain }}.      IN     A     {{ ansible_default_ipv4.address }}
+
+; All other A records
+;bastion.{{ base_domain }}.   IN     A     {{ ansible_default_ipv4.address }}
+
+{{ bootstrap[0].name }}             IN     A     {{ bootstrap[0].ip }}
+{{ masters[0].name }}             IN     A     {{ masters[0].ip }}
+{{ masters[1].name }}             IN     A     {{ masters[1].ip }}
+{{ masters[2].name }}             IN     A     {{ masters[2].ip }}
+{{ workers[0].name }}             IN     A     {{ workers[0].ip }}
+{{ workers[1].name }}             IN     A     {{ workers[1].ip }}
+
+$ORIGIN {{ cluster_name }}.{{ base_domain }}.
+api                   IN     A     {{ ansible_default_ipv4.address }}
+api-int               IN     A     {{ ansible_default_ipv4.address }}
+etcd-0                IN     A     {{ masters[0].ip }}
+etcd-1                IN     A     {{ masters[1].ip }}
+etcd-2                IN     A     {{ masters[2].ip }}
+
+_etcd-server-ssl._tcp SRV 0 10 2380 etcd-0
+_etcd-server-ssl._tcp SRV 0 10 2380 etcd-1
+_etcd-server-ssl._tcp SRV 0 10 2380 etcd-2
+
+$ORIGIN apps.{{ cluster_name }}.{{ base_domain }}.
+*                     IN     A     {{ ansible_default_ipv4.address }}
+

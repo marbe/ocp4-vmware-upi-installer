@@ -1,0 +1,122 @@
+# dhcpd.conf
+#
+# Sample configuration file for ISC dhcpd
+#
+
+# option definitions common to all supported networks...
+option domain-name "{{ base_domain }}";
+option domain-name-servers ns01.{{ base_domain }};
+
+default-lease-time 600;
+max-lease-time 7200;
+
+# Use this to enble / disable dynamic dns updates globally.
+#ddns-update-style none;
+
+# If this DHCP server is the official DHCP server for the local
+# network, the authoritative directive should be uncommented.
+#authoritative;
+
+# Use this to send dhcp log messages to a different log file (you also
+# have to hack syslog.conf to complete the redirection).
+log-facility local7;
+
+# No service will be given on this subnet, but declaring it helps the
+# DHCP server to understand the network topology.
+
+# This is a very basic subnet declaration
+
+subnet {{ machineCIDR_first_ip }} netmask {{ machineCIDR_netmask }} {
+  range {{ machineCIDR_first_three_octects }}.32 {{ machineCIDR_first_three_octects }}.63;
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+  option domain-name "{{ base_domain }}";
+}
+
+# This declaration allows BOOTP clients to get dynamic addresses,
+# which we don't really recommend.
+
+#subnet 10.254.239.32 netmask 255.255.255.224 {
+#  range dynamic-bootp 10.254.239.40 10.254.239.60;
+#  option broadcast-address 10.254.239.31;
+#  option routers rtr-239-32-1.example.org;
+#}
+
+# A slightly different configuration for an internal subnet.
+#subnet 10.5.5.0 netmask 255.255.255.224 {
+#  range 10.5.5.26 10.5.5.30;
+#  option domain-name-servers ns1.internal.example.org;
+#  option domain-name "internal.example.org";
+#  option routers 10.5.5.1;
+#  option broadcast-address 10.5.5.31;
+#  default-lease-time 600;
+#  max-lease-time 7200;
+#}
+
+# Hosts which require special configuration options can be listed in
+# host statements.   If no address is specified, the address will be
+# allocated dynamically (if possible), but the host-specific information
+# will still come from the host declaration.
+
+#host passacaglia {
+#  hardware ethernet 0:0:c0:5d:bd:95;
+#  filename "vmunix.passacaglia";
+#  server-name "toccata.fugue.com";
+#}
+
+# Fixed IP addresses can also be specified for hosts.   These addresses
+# should not also be listed as being available for dynamic assignment.
+# Hosts for which fixed IP addresses have been specified can boot using
+# BOOTP or DHCP.   Hosts for which no fixed address is specified can only
+# be booted with DHCP, unless there is an address range on the subnet
+# to which a BOOTP client is connected which has the dynamic-bootp flag
+# set.
+
+host bootstrap {
+  hardware ethernet {{ bootstrap[0].mac }};
+  fixed-address {{ bootstrap[0].ip }};
+  option host-name "{{ bootstrap[0].name }}.{{ base_domain }}";
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+}
+
+host masters01 {
+  hardware ethernet {{ masters[0].mac }};
+  fixed-address {{ masters[0].ip }};
+  option host-name "{{ masters[0].name }}.{{ base_domain }}";
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+}
+
+host masters02 {
+  hardware ethernet {{ masters[1].mac }};
+  fixed-address {{ masters[1].ip }};
+  option host-name "{{ masters[1].name }}.{{ base_domain }}";
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+}
+
+host masters03 {
+  hardware ethernet {{ masters[2].mac }};
+  fixed-address {{ masters[2].ip }};
+  option host-name "{{ masters[2].name }}.{{ base_domain }}";
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+}
+
+host workers01 {
+  hardware ethernet {{ workers[0].mac }};
+  fixed-address {{ workers[0].ip }};
+  option host-name "{{ workers[0].name }}.{{ base_domain }}";
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+}
+
+host workers02 {
+  hardware ethernet {{ workers[1].mac }};
+  fixed-address {{ workers[1].ip }};
+  option host-name "{{ workers[1].name }}.{{ base_domain }}";
+  option routers {{ machineCIDR_default_gw }};
+  option domain-name-servers {{ ansible_default_ipv4.address }};
+}
+

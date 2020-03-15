@@ -1,0 +1,80 @@
+- name: install bind
+  package:
+    name: bind
+    state: present
+
+- name: populate service facts
+  service_facts:
+
+- name: Set selinux named flag on and keep them persistent across reboots
+  seboolean:
+    name: named_write_master_zones
+    state: yes
+    persistent: yes
+  when: ansible_selinux.status == "enabled"
+
+- name: configure named.conf from template
+  template:
+    src: "{{ playbook_dir }}/../templates/named.conf.j2"
+    dest: "/etc/named.conf"
+  notify:
+    - restart named
+
+- name: create zones directory
+  file:
+    path: /etc/named/zones
+    state: directory
+    mode: '0755'
+
+- name: configure named-direct-resolution.conf from template
+  template:
+    src: "{{ playbook_dir }}/../templates/named-direct-resolution.conf.j2"
+    dest: "/etc/named/zones/named-direct-resolution.conf"
+  notify:
+    - restart named
+
+- name: configure named-reverse-resolution.conf from template
+  template:
+    src: "{{ playbook_dir }}/../templates/named-reverse-resolution.conf.j2"
+    dest: "/etc/named/zones/named-reverse-resolution.conf"
+  notify:
+    - restart named
+
+- name: ensure named is running
+  service:
+    name: named
+    state: started
+    enabled: yes
+
+- name: Allow infrastructure services on firewall
+  firewalld:
+    service: dns
+    permanent: yes
+    state: enabled
+    immediate: yes
+    zone: public
+  when: ansible_facts.services['firewalld.service'].status == 'enabled'
+
+- name: make sure line 'dns=none' is set in /etc/NetworkManager/NetworkManager.conf
+  ini_file:
+    path: /etc/NetworkManager/NetworkManager.conf
+    state: present
+    no_extra_spaces: yes
+    section: main
+    option: dns
+    value: none
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: configure resolv.conf
+  replace:
+    path: /etc/resolv.conf
+    regexp: '^(nameserver) .*$'
+    replace: '\1 {{ ansible_default_ipv4.address }}'
+
+- name: reload NetworkManager
+  service:
+    name: NetworkManager
+    state: reloaded

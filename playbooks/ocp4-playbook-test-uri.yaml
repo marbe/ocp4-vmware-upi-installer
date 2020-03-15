@@ -8,7 +8,7 @@
     - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
 
   tasks:
-    - name: Check that you can connect (GET) to a page and it returns a status 200
+    - name: Check that MANDATORY URI connect (GET) returns a status 200
       uri:
         url: "https://{{ item }}"
         timeout: 5
@@ -16,5 +16,15 @@
         force: yes
       environment: "{{ proxy_env }}"
       loop:
-        "{{ proxy_whitelist }}"
+        "{{ proxy_whitelist_mandatory }}"
+
+    - name: Check that OPTIONAL URI connect (GET) returns a status 200
+      uri:
+        url: "https://{{ item }}"
+        timeout: 5
+        validate_certs: no
+        force: yes
+      environment: "{{ proxy_env }}"
+      loop:
+        "{{ proxy_whitelist_optional }}"
 
