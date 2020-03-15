@@ -36,7 +36,7 @@ Other useful information are provided within Ansible [VMware Guide](https://docs
 ## Provided Playbooks
 Playbook name | Description
 --- | ---
-`ocp4-playbook-vmware-prereq.yaml` | Install vmware_gues prerequisites (currently pyvmomi).
+`ocp4-playbook-vmware-prereq.yaml` | Install vmware_guest ansible module's prerequisites (currently pyvmomi).
 `ocp4-playbook-cluster-create.yaml`| Setup the OpenShift 4 cluster manifests (ignition files, certificates) and creates VMs on vmware cluster. All VMs are created powered off.
 `ocp4-playbook-poweron-vms.yaml`| Power on OpenShift VMs on vmware cluster.
 `ocp4-playbook-erase-vms.yaml`| Power off and erase OpenShift  VMs on vmware cluster.
@@ -44,7 +44,7 @@ Playbook name | Description
 `ocp4-playbook-test-dns.yaml`| Test for proper DNS records configuration.
 `ocp4-playbook-boot_delay-vms.yaml`| Configure Boot Delay for VMs in order to let the possibility to press the TAB or E key to edit the kernel command line. 
 `epel-enable-playbook.yaml`| Playbook to enable epel repository if needed (e.g. to install `ansible` from epel or `nagios-plugins-dhcp` to debug dhcp configuration).
-`infrastructure-services-setup.yaml`| TO-DO: Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
+`infrastructure-services-setup.yaml`| Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
 
 ## How to use these playbooks to install your OpenShift 4 cluster
 1. clone/download this repo on _bastion host_.
@@ -71,7 +71,7 @@ Also:
 and
 * `oc`
 
-binaries are installed under `/tmp/directory` in such a way that, after VMs poweron, you can follow and complete the installation with:
+binaries are installed under `/tmp` directory in such a way that, after VMs poweron, you can follow and complete the installation with:
 
 ```
 $ /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for bootstrap-complete
@@ -86,7 +86,7 @@ $ /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for in
 ```
 
 ## Installation with static IP
-At the time of writing this project, **static IP** address setting for vmware UPI installation is not documented on public documentation. Anyway the supported procedure is the very same of baremetal scenario.
+At the time of writing this project, **static IP** address setting is not documented specifically for vSphere UPI installation. The supported procedure is the very same of baremetal scenario.
 
 The supported procedure consists of **modifying first boot kernel parameters** by editing the kernel command line, as described [here](https://docs.openshift.com/container-platform/4.3/installing/installing_bare_metal/installing-bare-metal-network-customizations.html#installation-user-infra-machines-iso_installing-bare-metal-network-customizations).
 
@@ -138,11 +138,7 @@ $ govc ls /DC1/vm/ocp4
 /DC1/vm/ocp4/rhcos-4.3.0-x86_64
 ```
 
-## To Do
-* Add Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
-
 ## How to contribute
 Pull requests are wellcome!
 
 Please provide your contributions by [branching](https://guides.github.com/introduction/flow/) master branch.
-
