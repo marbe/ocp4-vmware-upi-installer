@@ -50,6 +50,7 @@ Playbook name | Description
 1. clone/download this repo on _bastion host_.
 1. Provide an SSH keypair that will be configured to access CoreOS OCP nodes with `core` user.
 1. customize `vars/ocp4-vars-vmware-upi-installer.yaml` var file with specific information related to your infrastructure.
+1. OPTIONAL - create infrastructure services (DNS, LB, DHCP) with playbook `infrastructure-services-setup.yaml`
 1. test URI https get with playbook `ocp4-playbook-test-uri.yaml`
 1. test DNS records configuration with playbook `ocp4-playbook-test-dns.yaml`
 1. install ansible vmware_guest prerequisites with playbook `ocp4-playbook-vmware-prereq.yaml`
