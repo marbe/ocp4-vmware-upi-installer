@@ -23,6 +23,9 @@
       hotadd_cpu: True
       hotremove_cpu: True
       hotadd_memory: False
+    customvalues:
+      - key: disk.EnableUUID
+        value: "TRUE"
     networks:
     - name: "{{ vcenter.network }}"
     wait_for_ip_address: no

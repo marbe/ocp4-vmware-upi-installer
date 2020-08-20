@@ -2,7 +2,7 @@
 ############## General variables to set working environment - BEGIN
 # Directory to store openshift installation files:
 work_dir: "/tmp/openshift-install-{{ lookup('pipe','date +%Y%m%d') }}"
-ocp_version: 4.3.5
+ocp_version: 4.4.12
 openshift_clients_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ ocp_version }}"
 client_linux: "openshift-client-linux-{{ ocp_version }}.tar.gz"
 install_linux: "openshift-install-linux-{{ ocp_version }}.tar.gz"

@@ -25,7 +25,7 @@ At first, you will need to install python pip on your system. You can do it by:
 1. enabling `epel` package repository using `epel-enable-playbook.yaml`
 1. running:  `# yum install python-pip`
 
-Finally, **[`pvvmomi`](https://docs.ansible.com/ansible/latest/scenario_guides/vmware_scenarios/vmware_intro.html)**  installation can be managed by the specific pre-requisites playbook (`epel-enable-playbook.yaml`). 
+Finally, **[`pvvmomi`](https://docs.ansible.com/ansible/latest/scenario_guides/vmware_scenarios/vmware_intro.html)**  installation can be managed by the specific pre-requisites playbook (`ocp4-playbook-vmware-prereq.yaml`). 
 
 ### vSphere Permissions
 vSphere permissions required from OpenShift installer to properly configure vsphere storageclass are detailed on [vmware vsphere storage for kubernetes page](https://vmware.github.io/vsphere-storage-for-kubernetes/documentation/vcp-roles.html).
