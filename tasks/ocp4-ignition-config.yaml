@@ -3,33 +3,39 @@
     path: "{{ work_dir }}"
     state: directory
     mode: '0755'
+  tags: create_manifest
 
 - name: Verify if install-config already run
   stat:
     path: "{{ work_dir }}/master.ign"
   register: manifest_ign
+  tags: create_manifest
 
 - debug:
     msg: "{{ work_dir }} has already been initialized. Please delete it if you want to re-initialize."
   when: manifest_ign.stat.exists
+  tags: create_manifest
 
 - name: configure install-config
   template:
     src: "{{ playbook_dir }}/../templates/install-config.yaml.j2"
     dest: "{{ work_dir}}/install-config.yaml"
   when: manifest_ign.stat.exists == false
+  tags: create_manifest
 
 - name: Copy install-config.yaml file
   copy:
     src: "{{ work_dir}}/install-config.yaml"
     dest: "{{ work_dir}}/install-config.yaml.copy"
   when: manifest_ign.stat.exists == false
+  tags: create_manifest
 
 - name: build manifests
   shell:
     cmd: /tmp/openshift-install create manifests --dir={{ work_dir}}
     chdir: "{{ work_dir }}"
   when: manifest_ign.stat.exists == false
+  tags: create_manifest
 
 - name: unset mastersSchedulable
   replace:
@@ -37,6 +43,19 @@
     regexp: '(mastersSchedulable:) true'
     replace: '\1 false'
   when: manifest_ign.stat.exists == false
+  tags: create_manifest
+
+- name: Remove manifest that define control plane machines and compute machineSets
+  file:
+    path: "{{ work_dir}}/{{ item }}"
+    state: absent
+  loop:
+    - openshift/99_openshift-cluster-api_master-machines-0.yaml
+    - openshift/99_openshift-cluster-api_master-machines-1.yaml
+    - openshift/99_openshift-cluster-api_master-machines-2.yaml
+    - openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+  when: manifest_ign.stat.exists == false
+  tags: create_manifest
 
 - name: create ignition-configs
   shell:
