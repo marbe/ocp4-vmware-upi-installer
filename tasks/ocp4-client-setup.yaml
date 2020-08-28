@@ -6,6 +6,7 @@
     - "{{ client_linux }}"
     - "{{ install_linux }}"
   environment: "{{ proxy_env }}"
+  tags: [ create_manifest ]
 
 - name: Extract openshift clients
   unarchive:
@@ -14,4 +15,4 @@
   loop:
     - "{{ client_linux }}"
     - "{{ install_linux }}"
-
+  tags: [ create_manifest ]

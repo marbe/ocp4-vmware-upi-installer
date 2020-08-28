@@ -11,16 +11,19 @@
       assert:
         that:
           - "ansible_os_family == 'RedHat'"
+      tags: [ create_manifest ]
 
     - name: include task for client setup
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-client-setup.yaml"
+      tags: [ create_manifest ]
 
     - name: include task for yum proxy setup
       include_tasks: "{{ playbook_dir }}/../tasks/yum_set_proxy.yaml"
+      tags: [ create_manifest ]
 
     - name: include task vms for ignition config
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-ignition-config.yaml"
-      tags: replaceign
+      tags: [ replaceign, create_manifest ]
 
     - name: include task for httpd ignition providing
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-httpd-ignition-provide.yaml"

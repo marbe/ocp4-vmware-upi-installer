@@ -5,6 +5,7 @@
     line: "proxy={{ proxy_env.http_proxy }}"
     state: present
   when: use_proxy_for_yum|bool
+  tags: [ create_manifest ]
 
 - name: unset yum proxy if not needed
   lineinfile:
@@ -13,4 +14,4 @@
     line: "proxy={{ proxy_env.http_proxy }}"
     state: absent
   when: not use_proxy_for_yum
-
+  tags: [ create_manifest ]
