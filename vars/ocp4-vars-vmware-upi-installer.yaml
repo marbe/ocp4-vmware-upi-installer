@@ -27,6 +27,7 @@ vcenter:
   cluster: ""
   datastore: ""
   network: ""
+  folder: ""
 # Variable required if multiple distributed portgroups exists:
 #  dvswitch_name: ""
 ova_template_name: ''
