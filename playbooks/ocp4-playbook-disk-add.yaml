@@ -1,0 +1,13 @@
+---
+- name: Play to add disks to storage_nodes
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+    - name: include task ocp4-nodes-disks-add
+      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-disks-add.yaml"
+      vars:
+        nodes: "{{ storage_nodes }}"
+

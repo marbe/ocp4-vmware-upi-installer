@@ -43,6 +43,7 @@ Playbook name | Description
 `ocp4-playbook-test-uri.yaml` | Test https get to URI required to install and use OpenShift.
 `ocp4-playbook-test-dns.yaml`| Test for proper DNS records configuration.
 `ocp4-playbook-boot_delay-vms.yaml`| Configure Boot Delay for VMs in order to let the possibility to press the TAB or E key to edit the kernel command line. 
+`ocp4-playbook-disk-add.yaml`| Add `additional_disks` to `storage_nodes` in order to use Local Storage Operator to deploy OpenShift Container Storage.
 `epel-enable-playbook.yaml`| Playbook to enable epel repository if needed (e.g. to install `ansible` from epel or `nagios-plugins-dhcp` to debug dhcp configuration).
 `infrastructure-services-setup.yaml`| Playbook to install and configure infrastructure services (DNS, LB, DHCP) on _bastion host_ in order to completely automate UPI pre-requisites.
 

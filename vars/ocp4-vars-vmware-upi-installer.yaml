@@ -83,5 +83,34 @@ masters:
 workers:
 - { name: "worker01", mac: "{{ mac_range_start }}:04", ip: "{{ machineCIDR_first_three_octects }}.104", disk: "120", memory: "8192", cpu: "2" }
 - { name: "worker02", mac: "{{ mac_range_start }}:05", ip: "{{ machineCIDR_first_three_octects }}.105", disk: "120", memory: "8192", cpu: "2" }
+- { name: "worker03", mac: "{{ mac_range_start }}:06", ip: "{{ machineCIDR_first_three_octects }}.106", disk: "120", memory: "8192", cpu: "2" }
 ################## OpenShift Nodes details to provision VMs on vmware vCenter - END
+
+storage_nodes:
+- "worker01"
+- "worker02"
+- "worker03"
+
+additional_disks:
+  - size_gb: "500"
+    type: thin
+    datastore: "{{ vcenter.datastore }}"
+    state: present
+    scsi_controller: 1
+    unit_number: 1
+    scsi_type: 'paravirtual'
+  - size_gb: "500"
+    type: thin
+    datastore: "{{ vcenter.datastore }}"
+    state: present
+    scsi_controller: 1
+    unit_number: 2
+    scsi_type: 'paravirtual'
+  - size_gb: "500"
+    type: thin
+    datastore: "{{ vcenter.datastore }}"
+    state: present
+    scsi_controller: 1
+    unit_number: 3
+    scsi_type: 'paravirtual'
 
