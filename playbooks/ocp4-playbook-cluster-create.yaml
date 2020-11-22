@@ -15,7 +15,7 @@
 
     - name: include task for client setup
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-client-setup.yaml"
-      tags: [ create_manifest ]
+      tags: [ download_client, create_manifest ]
 
     - name: include task for yum proxy setup
       include_tasks: "{{ playbook_dir }}/../tasks/yum_set_proxy.yaml"
@@ -38,19 +38,31 @@
       vars:
         nodes: "{{ bootstrap }}"
         ignition_payload: "{{ append_bootstrap_ign }}"
+        default_gw: "{{ machineCIDR_default_gw }}"
+        netmask: "{{ machineCIDR_netmask }}"
+        nameserver: "{{ machineDNS }}"
       tags: vmware
+      when: bootstrap is defined
 
     - name: include create task vms for masters node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
       vars:
         nodes: "{{ masters }}"
         ignition_payload: "{{ master_ign }}"
+        default_gw: "{{ machineCIDR_default_gw }}"
+        netmask: "{{ machineCIDR_netmask }}"
+        nameserver: "{{ machineDNS }}"
       tags: vmware
+      when: masters is defined
 
     - name: include create task vms for workers node
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-nodes-create.yaml"
       vars:
         nodes: "{{ workers }}"
         ignition_payload: "{{ worker_ign }}"
+        default_gw: "{{ machineCIDR_default_gw }}"
+        netmask: "{{ machineCIDR_netmask }}"
+        nameserver: "{{ machineDNS }}"
       tags: vmware
+      when: workers is defined
 

@@ -76,9 +76,15 @@ and
 binaries are installed under `/tmp` directory in such a way that, after VMs poweron, you can follow and complete the installation with:
 
 ```
+$ ansible-playbook ocp4-vmware-upi-installer/playbooks/ocp4-playbook-cluster-create.yaml
+
+$ ansible-playbook ocp4-vmware-upi-installer/playbooks/ocp4-playbook-poweron-vms.yaml
+
 $ /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for bootstrap-complete
 
 $ export KUBECONFIG=/tmp/openshift-install-<date +%Y%m%d>/auth/kubeconfig
+
+$ /tmp/oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs /tmp/oc adm certificate approve
 
 $ /tmp/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{"spec":{"storage":{"emptyDir":{}}}}'
 
@@ -88,11 +94,21 @@ $ /tmp/openshift-install --dir=/tmp/openshift-install-<date +%Y%m%d> wait-for in
 ```
 
 ## Installation with static IP
-At the time of writing this project, **static IP** address setting is not documented specifically for vSphere UPI installation. The supported procedure is the very same of baremetal scenario.
+At the time of first writing this project, **static IP** address setting was not documented specifically for vSphere UPI installation. The supported procedure was the very same of baremetal scenario.
 
-The supported procedure consists of **modifying first boot kernel parameters** by editing the kernel command line, as described [here](https://docs.openshift.com/container-platform/4.3/installing/installing_bare_metal/installing-bare-metal-network-customizations.html#installation-user-infra-machines-iso_installing-bare-metal-network-customizations).
+The supported procedure consisted of **modifying first boot kernel parameters** by editing the kernel command line, as described [here](https://docs.openshift.com/container-platform/4.3/installing/installing_bare_metal/installing-bare-metal-network-customizations.html#installation-user-infra-machines-iso_installing-bare-metal-network-customizations).
 
-In order to let the time to press the TAB or E key after powering up VM on vcenter console, you can use the `ocp4-playbook-boot_delay-vms.yaml` playbook that configures Boot Delay VMs parameter (default 10s).
+In order to let the time to press the TAB or E key after powering up VM on vcenter console, ayou could use the `ocp4-playbook-boot_delay-vms.yaml` playbook that configures Boot Delay VMs parameter (default 10s).
+
+**UPDATE WITH OpenShift Container Platform 4.6 release**
+
+You can now override default Dynamic Host Configuration Protocol (DHCP) networking in vSphere. This requires setting the static IP configuration and then setting a guestinfo property before booting a VM from an OVA in vSphere:
+
+ * https://docs.openshift.com/container-platform/4.6/release_notes/ocp-4-6-release-notes.html#ocp-4-6-static-ip-config-with-ova
+
+In order to use static IP with this playbook, simply set `static_ip: true` into var file `vars/ocp4-vars-vmware-upi-installer.yaml` and configure variables in the proper way.
+
+**NOTE: Having DNS records properly set for each node is a prerequisite for both direct and reverse (PTR record) resolution.**
 
 ### Finding vmware details with govc
 In order to find information related to vmware infrastructure, [govc](https://github.com/vmware/govmomi/tree/master/govc) software can be used:

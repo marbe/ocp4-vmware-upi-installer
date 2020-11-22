@@ -2,7 +2,7 @@
 ############## General variables to set working environment - BEGIN
 # Directory to store openshift installation files:
 work_dir: "/tmp/openshift-install-{{ lookup('pipe','date +%Y%m%d') }}"
-ocp_version: 4.4.12
+ocp_version: 4.6.4
 openshift_clients_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ ocp_version }}"
 client_linux: "openshift-client-linux-{{ ocp_version }}.tar.gz"
 install_linux: "openshift-install-linux-{{ ocp_version }}.tar.gz"
@@ -30,7 +30,7 @@ vcenter:
   folder: ""
 # Variable required if multiple distributed portgroups exists:
 #  dvswitch_name: ""
-ova_template_name: ''
+ova_template_name: 'YOUR-PATH/coreos-4.6.1'
 vm_boot_delay: 10000
 ############## VMware vCenter variables - END
 
@@ -63,6 +63,7 @@ machineCIDR_first_three_octects_reverse: "{{ machineCIDR_first_three_octects | r
 machineCIDR_default_gw: "{{ machineCIDR_first_three_octects }}.1"
 # this should be set to corporate DNS
 dns_forwarder: "8.8.8.8"
+machineDNS: "{{machineCIDR_default_gw}}"
 #######################  Variables below for DNS & DHCP server setup - END
 
 ################## OpenShift Nodes details to provision VMs on vmware vCenter - BEGIN
@@ -71,25 +72,26 @@ dns_forwarder: "8.8.8.8"
 # Minimum setup consists of one bootstrap, three masters and two workers.
 # More workers can be added by adding more lines in 'workers:' list. PLEASE MODIFY named and dhcpd templates ACCORDINGLY if DHCP & DNS setup is required.
 mac_range_start: 00:50:56:00:22
+static_ip: true
 
 bootstrap:
 - { name: "bootstrap", mac: "{{ mac_range_start }}:00", ip: "{{ machineCIDR_first_three_octects }}.100", disk: "120", memory: "16384", cpu: "4" }
 
 masters:
-- { name: "master01", mac: "{{ mac_range_start }}:01", ip: "{{ machineCIDR_first_three_octects }}.101", disk: "120", memory: "16384", cpu: "4" }
-- { name: "master02", mac: "{{ mac_range_start }}:02", ip: "{{ machineCIDR_first_three_octects }}.102", disk: "120", memory: "16384", cpu: "4" }
-- { name: "master03", mac: "{{ mac_range_start }}:03", ip: "{{ machineCIDR_first_three_octects }}.103", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master1", mac: "{{ mac_range_start }}:01", ip: "{{ machineCIDR_first_three_octects }}.101", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master2", mac: "{{ mac_range_start }}:02", ip: "{{ machineCIDR_first_three_octects }}.102", disk: "120", memory: "16384", cpu: "4" }
+- { name: "master3", mac: "{{ mac_range_start }}:03", ip: "{{ machineCIDR_first_three_octects }}.103", disk: "120", memory: "16384", cpu: "4" }
 
 workers:
-- { name: "worker01", mac: "{{ mac_range_start }}:04", ip: "{{ machineCIDR_first_three_octects }}.104", disk: "120", memory: "8192", cpu: "2" }
-- { name: "worker02", mac: "{{ mac_range_start }}:05", ip: "{{ machineCIDR_first_three_octects }}.105", disk: "120", memory: "8192", cpu: "2" }
-- { name: "worker03", mac: "{{ mac_range_start }}:06", ip: "{{ machineCIDR_first_three_octects }}.106", disk: "120", memory: "8192", cpu: "2" }
+- { name: "worker1", mac: "{{ mac_range_start }}:04", ip: "{{ machineCIDR_first_three_octects }}.104", disk: "120", memory: "8192", cpu: "2" }
+- { name: "worker2", mac: "{{ mac_range_start }}:05", ip: "{{ machineCIDR_first_three_octects }}.105", disk: "120", memory: "8192", cpu: "2" }
+- { name: "worker3", mac: "{{ mac_range_start }}:06", ip: "{{ machineCIDR_first_three_octects }}.106", disk: "120", memory: "8192", cpu: "2" }
 ################## OpenShift Nodes details to provision VMs on vmware vCenter - END
 
 storage_nodes:
-- "worker01"
-- "worker02"
-- "worker03"
+- "worker1"
+- "worker2"
+- "worker3"
 
 additional_disks:
   - size_gb: "500"

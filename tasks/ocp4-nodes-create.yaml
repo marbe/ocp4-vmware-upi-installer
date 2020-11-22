@@ -1,4 +1,4 @@
-- name: Create a virtual machine from a template
+- name: Create OCP node with DHCP
   vmware_guest:
     hostname: "{{ vcenter.hostname }}"
     username: "{{ vcenter.username }}"
@@ -24,16 +24,21 @@
       hotremove_cpu: True
       hotadd_memory: False
     customvalues:
-      - key: disk.EnableUUID
+      - key: "disk.EnableUUID"
         value: "TRUE"
+      - key: "guestinfo.ignition.config.data.encoding"
+        value: "base64"
+      - key: "guestinfo.ignition.config.data"
+        value: "{{ ignition_payload }}"
     networks:
     - name: "{{ vcenter.network }}"
     wait_for_ip_address: no
   loop: "{{ nodes }}"
   delegate_to: localhost
   tags: vmware
+  when: not static_ip
 
-- name: Configure MAC address
+- name: Configure OCP node MAC address for DHCP
   vmware_guest_network:
     hostname: "{{ vcenter.hostname }}"
     username: "{{ vcenter.username }}"
@@ -54,8 +59,9 @@
   loop: "{{ nodes }}"
   delegate_to: localhost
   tags: vmware
+  when: not static_ip
 
-- name: Configure VAPP properties
+- name: Create OCP node with static IP
   vmware_guest:
     hostname: "{{ vcenter.hostname }}"
     username: "{{ vcenter.username }}"
@@ -65,16 +71,35 @@
     validate_certs: no
     folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
     name: "{{ item.name }}"
-    state: present
-    vapp_properties:
-    - id: "guestinfo.ignition.config.data.encoding"
-      value: "base64"
-    - id: "guestinfo.ignition.config.data"
-      value: "{{ ignition_payload }}"
-## This has been commented out because it is not effective at this level. It MUST BE configured as VM Option into the VM temlpate imported from OVA.
-#    - id: "disk.EnableUUID"
-#      value: "TRUE"
+    state: poweredoff
+    template: "{{ ova_template_name }}"
+    disk:
+    - size_gb: "{{ item.disk }}"
+      type: thin
+      datastore: "{{ vcenter.datastore }}"
+    hardware:
+      memory_mb: "{{ item.memory }}"
+      num_cpus: "{{ item.cpu }}"
+      memory_reservation_lock: True
+      mem_limit: "{{ item.memory }}"
+      mem_reservation: "{{ item.memory }}"
+      hotadd_cpu: True
+      hotremove_cpu: True
+      hotadd_memory: False
+    networks:
+    - name: "{{ vcenter.network }}"
+    customvalues:
+      - key: "disk.EnableUUID"
+        value: "TRUE"
+      - key: "guestinfo.ignition.config.data.encoding"
+        value: "base64"
+      - key: "guestinfo.ignition.config.data"
+        value: "{{ ignition_payload }}"
+      - key: "guestinfo.afterburn.initrd.network-kargs"
+        value: "ip={{ item.ip }}::{{ default_gw }}:{{ netmask }}:::none nameserver={{ nameserver }}"
+    wait_for_ip_address: no
   loop: "{{ nodes }}"
   delegate_to: localhost
   tags: vmware
+  when: static_ip
 
