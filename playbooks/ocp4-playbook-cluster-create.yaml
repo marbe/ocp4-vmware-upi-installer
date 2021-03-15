@@ -40,7 +40,7 @@
         ignition_payload: "{{ append_bootstrap_ign }}"
         default_gw: "{{ machineCIDR_default_gw }}"
         netmask: "{{ machineCIDR_netmask }}"
-        nameserver: "{{ machineDNS }}"
+        nameserver: "{{ machineDNS | join(':') }}"
       tags: vmware
       when: bootstrap is defined
 
@@ -51,7 +51,7 @@
         ignition_payload: "{{ master_ign }}"
         default_gw: "{{ machineCIDR_default_gw }}"
         netmask: "{{ machineCIDR_netmask }}"
-        nameserver: "{{ machineDNS }}"
+        nameserver: "{{ machineDNS | join(':') }}"
       tags: vmware
       when: masters is defined
 
@@ -62,7 +62,7 @@
         ignition_payload: "{{ worker_ign }}"
         default_gw: "{{ machineCIDR_default_gw }}"
         netmask: "{{ machineCIDR_netmask }}"
-        nameserver: "{{ machineDNS }}"
+        nameserver: "{{ machineDNS | join(':') }}"
       tags: vmware
       when: workers is defined
 
