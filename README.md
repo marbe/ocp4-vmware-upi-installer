@@ -3,6 +3,8 @@ This repository contains [Ansible](https://www.ansible.com/) playbooks and tasks
 
 The aim of this playbooks is to automate the UPI installation steps described into [Red Hat OpenShift documentation](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html)
 
+These playbooks have been tested with **OpenShift Container Platform** up to **4.7.z**. 
+
 ## Pre-requisites
 The minimun pre-requisite is a Red Hat / CentOS server to run this repo's playbooks on, called _bastion_ or _jump host_.
 
@@ -15,7 +17,8 @@ Ansible require version on _bastion host_:
 
 * ansible > 2.8 is required
 * These playbooks have been developed and tested with **ansible 2.9.3**.
-
+* ansible >= 2.10 may lead to issues.
+ 
 Some playbooks are provided in order to test that infrastructure pre-requisites are met, specifically those related to DNS records.
 
 ### Python pip and pyvmomi
