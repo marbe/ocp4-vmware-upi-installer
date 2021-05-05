@@ -6,7 +6,7 @@
     datacenter: "{{ vcenter.datacenter }}"
     cluster: "{{ vcenter.cluster }}"
     validate_certs: no
-    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    folder: "{{ vcenter.folder }}"
     name: "{{ item.name }}"
     state: poweredoff
     template: "{{ ova_template_name }}"
@@ -46,7 +46,7 @@
     datacenter: "{{ vcenter.datacenter }}"
     cluster: "{{ vcenter.cluster }}"
     validate_certs: no
-    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    folder: "{{ vcenter.folder }}"
     name: "{{ item.name }}"
     gather_network_info: false
     networks:
@@ -69,7 +69,7 @@
     datacenter: "{{ vcenter.datacenter }}"
     cluster: "{{ vcenter.cluster }}"
     validate_certs: no
-    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    folder: "{{ vcenter.folder }}"
     name: "{{ item.name }}"
     state: poweredoff
     template: "{{ ova_template_name }}"
@@ -96,7 +96,7 @@
       - key: "guestinfo.ignition.config.data"
         value: "{{ ignition_payload }}"
       - key: "guestinfo.afterburn.initrd.network-kargs"
-        value: "ip={{ item.ip }}::{{ default_gw }}:{{ netmask }}:::none nameserver={{ nameserver }}"
+        value: "ip={{ item.ip }}::{{ default_gw }}:{{ netmask }}:::none:{{ nameservers }}"
     wait_for_ip_address: no
   loop: "{{ nodes }}"
   delegate_to: localhost

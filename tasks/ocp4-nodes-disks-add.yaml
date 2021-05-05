@@ -5,7 +5,7 @@
     password: "{{ vcenter.password }}"
     datacenter: "{{ vcenter.datacenter }}"
     validate_certs: no
-    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    folder: "{{ vcenter.folder }}"
     name: "{{ item }}"
     disk: "{{ additional_disks }}"
 #    - size_mb: "{{ additional_disk_size }}"

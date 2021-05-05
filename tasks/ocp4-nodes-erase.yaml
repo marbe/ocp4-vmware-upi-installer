@@ -6,7 +6,7 @@
     datacenter: "{{ vcenter.datacenter }}"
     cluster: "{{ vcenter.cluster }}"
     validate_certs: no
-    folder: "/{{ vcenter.datacenter }}/vm/{{ cluster_name }}"
+    folder: "{{ vcenter.folder }}"
     name: "{{ item.name }}"
     state: absent
     force: yes

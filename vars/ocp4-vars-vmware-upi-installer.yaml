@@ -63,7 +63,11 @@ machineCIDR_first_three_octects_reverse: "{{ machineCIDR_first_three_octects | r
 machineCIDR_default_gw: "{{ machineCIDR_first_three_octects }}.1"
 # this should be set to corporate DNS
 dns_forwarder: "8.8.8.8"
-machineDNS: "{{machineCIDR_default_gw}}"
+machineDNS:
+#Primary DNS
+- "{{machineCIDR_default_gw}}"
+#Secondary DNS
+- "{{ machineCIDR_first_three_octects }}.2"
 #######################  Variables below for DNS & DHCP server setup - END
 
 ################## OpenShift Nodes details to provision VMs on vmware vCenter - BEGIN
