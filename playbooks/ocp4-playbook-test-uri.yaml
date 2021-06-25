@@ -18,13 +18,3 @@
       loop:
         "{{ proxy_whitelist_mandatory }}"
 
-    - name: Check that OPTIONAL URI connect (GET) returns a status 200
-      uri:
-        url: "https://{{ item }}"
-        timeout: 5
-        validate_certs: no
-        force: yes
-      environment: "{{ proxy_env }}"
-      loop:
-        "{{ proxy_whitelist_optional }}"
-

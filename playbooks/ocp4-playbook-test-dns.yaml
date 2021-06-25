@@ -29,30 +29,6 @@
         - api-int
         - "*.apps"
 
-    - name: check SRV record
-      command: dig _etcd-server-ssl._tcp.{{ cluster_name }}.{{ base_domain }} SRV +short
-      register: result
-    - debug:
-        msg: DNS query _etcd-server-ssl._tcp.{{ cluster_name }}.{{ base_domain }} --> {{ result.stdout }}
-    - assert:
-        that:
-          - "'0 10 2380 {{ etcdx }}.{{ cluster_name }}.{{ base_domain }}.' in result.stdout"
-      loop:
-        - etcd-0
-        - etcd-1
-        - etcd-2
-      loop_control:
-        loop_var: etcdx
-
-    - name: test masters and etcd records consistency
-      include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-masters-etcd.yaml"
-      vars:
-        prefix: "{{ item }}"
-      loop:
-        - etcd-0
-        - etcd-1
-        - etcd-2
-
     - name: test bootstrap
       include_tasks: "{{ playbook_dir }}/../tasks/ocp4-test-dns-nodes.yaml"
       vars:

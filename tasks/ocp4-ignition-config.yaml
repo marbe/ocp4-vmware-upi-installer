@@ -63,12 +63,6 @@
     chdir: "{{ work_dir }}"
   when: manifest_ign.stat.exists == false
 
-- name: configure append bootstrap
-  template:
-    src: "{{ playbook_dir }}/../templates/append-bootstrap.ign.j2"
-    dest: "{{ work_dir}}/append-bootstrap.ign"
-  when: manifest_ign.stat.exists == false
-
 - name: install package to run base64 command
   package:
     name: coreutils
@@ -80,7 +74,7 @@
   loop:
     - master
     - worker
-    - append-bootstrap
+    - bootstrap
   when: manifest_ign.stat.exists == false
   tags: replaceign
 
@@ -110,7 +104,7 @@
     contents: "{{ lookup('file', '{{ work_dir }}/{{ item }}') }}"
     placeholder: "{{ item | regex_replace('-', '_') | regex_replace('.64', '_ign') }}"
   loop:
-    - append-bootstrap.64
+    - bootstrap.64
     - master.64
     - worker.64
   tags: replaceign

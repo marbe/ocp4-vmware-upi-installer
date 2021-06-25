@@ -1,0 +1,24 @@
+- name: Play to debug this playbook
+  hosts: localhost
+
+  vars_files:
+    - "{{ playbook_dir }}/../vars/ocp4-vars-vmware-upi-installer.yaml"
+
+  tasks:
+  - name: Print static IP configuration
+    vars:
+      nodes: "{{ masters }}"
+      ignition_payload: "{{ master_ign }}"
+      default_gw: "{{ machineCIDR_default_gw }}"
+      netmask: "{{ machineCIDR_netmask }}"
+      nameserver: "{{ machineDNS | join(':') }}"
+      baseDomain: "{{ machineBaseDomain }}"
+      interface: "{{ machineInterface }}"
+    debug:
+      msg: "ip={{ item.ip }}::{{ default_gw }}:{{ netmask }}:{{ item.name}}.{{ baseDomain }}:{{ interface }}:none nameserver={{ nameserver }}"
+#    debug:
+#      msg: "{{ default_gw }}"
+#    debug:
+#      msg: "{{ netmask }}"
+    loop: "{{ nodes }}"
+
